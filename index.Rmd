@@ -298,6 +298,7 @@ ggplotly(p_log_clean, height = 500, width = 750) %>%
 
 
 ---
+
 ## Mean vs Median as Skew (σ) Rises
 
 ```{r, distributions_mean_med, echo=FALSE, message=FALSE, warning=FALSE}
@@ -435,6 +436,12 @@ plot_ly(df) %>%
 **Takeaway ▶** Before quoting a single “average,” look at the distribution.  
 If it’s skewed or heavy-tailed, report the **median or percentiles** and pick the distribution that actually fits the data.
 ]
+
+---
+
+## Distributions
+
+### Types and Skew
 
 ---
 
