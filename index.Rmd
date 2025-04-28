@@ -1,0 +1,869 @@
+---
+title: "Statistical Concepts Everyone Should Know"
+subtitle: |
+  *Statistics for Life*
+
+author: |
+  **John Slough**  
+  *for* **The John & Calvin Podcast**
+
+output:
+  xaringan::moon_reader:
+    self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+
+---
+
+## 1. Mean vs Median
+
+```{r before_plotly, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(plotly)
+library(scales)
+
+ #── simulate your data ─────────────────────────────────────────────────────
+set.seed(123)
+wealth_before <- rlnorm(50, meanlog = 11, sdlog = 0.4)
+
+# ── compute stats ──────────────────────────────────────────────────────────
+mean_b <- mean(wealth_before)
+med_b  <- median(wealth_before)
+
+# ── define colours ─────────────────────────────────────────────────────────
+fill_color   <- "#5A6B80"
+edge_color   <- "#3C4756"
+mean_color   <- "#C04E3D"
+median_color <- "#BFA06D"
+
+# ── build a little HTML snippet for the annotation ─────────────────────────
+annotation_text <- paste0(
+  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
+    format(round(mean_b), big.mark = ","), 
+  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
+    format(round(med_b),  big.mark = ",")
+)
+
+# ── base ggplot (no annotate calls) ────────────────────────────────────────
+p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
+  geom_histogram(bins = 20, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
+  geom_vline(xintercept = mean(wealth_before), colour = mean_color,   linewidth = 1,  linetype   = "dashed") +
+  geom_vline(xintercept = median(wealth_before), colour = median_color, linewidth = 1, linetype   = "dashed") +
+  scale_x_continuous(labels = dollar_format()) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,NA),
+                     breaks = scales::breaks_pretty(),
+                     labels = scales::number_format(accuracy = 1)) +
+  labs(title    = "Wealth Distribution at Your Local Bar",
+       subtitle = "mean ≈ median",
+       x        = "wealth (USD)", y = "Count") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid.major.y = element_line(color = "grey90"),
+        panel.grid.major.x = element_blank(),
+        axis.line           = element_line(color = "black"),
+        axis.ticks          = element_line(color = "black"),
+        axis.ticks.length   = unit(0.2, "cm"),
+        plot.title          = element_text(margin = margin(b = 5)))
+
+# ── convert to plotly and add the annotation in layout ────────────────────
+# 6. just swap in the new annotation text
+ggplotly(p_before, height = 500, width = 750) %>%
+  layout(
+    title = list(
+      text    = paste0("Wealth Distribution at Your Local Bar",
+                       "<br><sup>mean ≈ median</sup>"),
+      y       = 0.9, yanchor = "top"
+    ),
+    margin      = list(t = 100),
+    annotations = list(
+      list(
+        x        = 0.95, y        = 0.9,
+        xref     = "paper", yref = "paper",
+        text     = annotation_text,
+        showarrow= FALSE,
+        align    = "right",
+        font     = list(size = 18, color = "black")
+      )
+    )
+  )
+
+
+```
+
+---
+
+## 1. Mean vs Median
+
+```{r after_plotly, echo=FALSE, message=FALSE, warning=FALSE}
+# ── only change: add Bill Gates’ wealth ─────────────────────────────
+# 3. compute the new stats including Bill’s 150 B
+all_wealths <- c(wealth_before, 150e9)
+mean_all    <- mean(all_wealths)
+med_all     <- median(all_wealths)
+
+# 4. build a new annotation text
+annotation_with_bill <- paste0(
+  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
+     format(round(mean_all), big.mark = ","),
+  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
+     format(round(med_all),  big.mark = ",")
+)
+
+# 5. re-draw exactly your old plot
+p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
+  geom_histogram(bins = 20, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
+  #geom_vline(xintercept = mean(wealth_before), colour = mean_color,   linewidth = 1) +
+  geom_vline(xintercept = median(wealth_before), colour = median_color, linewidth = 1, linetype   = "dashed") +
+  scale_x_continuous(labels = dollar_format()) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,NA),
+                     breaks = scales::breaks_pretty(),
+                     labels = scales::number_format(accuracy = 1)) +
+  labs(title    = "Wealth Distribution at Your Local Bar",
+       subtitle = "mean ≈ median",
+       x        = "wealth (USD)", y = "Count") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid.major.y = element_line(color = "grey90"),
+        panel.grid.major.x = element_blank(),
+        axis.line           = element_line(color = "black"),
+        axis.ticks          = element_line(color = "black"),
+        axis.ticks.length   = unit(0.2, "cm"),
+        plot.title          = element_text(margin = margin(b = 5)))
+
+# 6. just swap in the new annotation text
+ggplotly(p_before, height = 500, width = 750) %>%
+  layout(
+    title = list(
+      text    = paste0("Wealth Distribution at Your Local Bar",
+                       "<br><sup>mean ≈ median</sup>"),
+      y       = 0.9, yanchor = "top"
+    ),
+    margin      = list(t = 100),
+    annotations = list(
+      list(
+        x        = 0.95, y        = 0.9,
+        xref     = "paper", yref = "paper",
+        text     = annotation_with_bill,
+        showarrow= FALSE,
+        align    = "right",
+        font     = list(size = 18, color = "black")
+      )
+    )
+  )
+
+```
+
+---
+
+## 1. Mean vs Median
+
+
+```{r after_plotly2, echo=FALSE, message=FALSE, warning=FALSE}
+# ── only change: add Bill Gates’ wealth ─────────────────────────────
+#
+
+# 5. re-draw exactly your old plot
+p_before <- ggplot(data.frame(wealth = all_wealths), aes(wealth)) +
+  geom_histogram(
+    bins     = 50,
+    boundary = 0,           # ← force the first bin to start at 0
+    fill     = fill_color,
+    closed = "left",
+    color    = edge_color,
+    alpha    = 0.7
+  ) +
+  scale_x_continuous(
+    labels  = dollar_format(),
+    limits  = c(0, NA),     # ← drop any negative space
+    expand  = c(0, 0)       # ← tighten up to exactly 0 on the left
+  ) +
+  scale_y_continuous(
+    expand  = c(0, 0),
+    limits  = c(0, NA),
+    breaks  = scales::breaks_pretty(),
+    labels  = scales::number_format(accuracy = 1)
+  ) +
+  geom_vline(xintercept = mean(mean_all),  colour = mean_color,   linewidth = 0.5, linetype   = "dashed") +
+  geom_vline(xintercept = median(med_all), colour = median_color, linewidth = 0.5, linetype   = "dashed") +
+  labs(
+    title    = "Wealth Distribution at Your Local Bar",
+    subtitle = "mean ≈ median",
+    x        = "wealth (USD)", y = "Count"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_line(color = "grey90"),
+    panel.grid.major.x = element_blank(),
+    axis.line          = element_line(color = "black"),
+    axis.ticks         = element_line(color = "black"),
+    axis.ticks.length  = unit(0.2, "cm"),
+    plot.title         = element_text(margin = margin(b = 5))
+  )
+
+# 6. just swap in the new annotation text
+ggplotly(p_before, height = 500, width = 750) %>%
+  layout(
+    title = list(
+      text    = paste0("Wealth Distribution at Your Local Bar",
+                       "<br><sup>mean ≈ median</sup>"),
+      y       = 0.9, yanchor = "top"
+    ),
+    margin      = list(t = 100),
+    annotations = list(
+      list(
+        x        = 0.95, y        = 0.9,
+        xref     = "paper", yref = "paper",
+        text     = annotation_with_bill,
+        showarrow= FALSE,
+        align    = "right",
+        font     = list(size = 18, color = "black")
+      )
+    )
+  )
+
+```
+
+---
+
+## 1. Mean vs Median
+
+```{r after_plotly3, echo=FALSE, message=FALSE, warning=FALSE}
+
+p_log_clean <- ggplot(data.frame(wealth = all_wealths), aes(wealth)) +
+  geom_histogram(
+    bins  = 20,
+    fill  = fill_color,
+    color = edge_color,
+    alpha = 0.7
+  ) +
+  scale_x_log10(
+    # pick the powers of ten you want
+    breaks = c(1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11),
+    # and supply matching, SI‐style labels
+    labels = c("$100K", "$1M", "$10M", "$100M", "$1B", "$10B", "$100B"),
+    expand = expansion(mult = 0.02)
+  ) +
+  annotation_logticks(sides = "b") +
+  scale_y_continuous(
+    expand = c(0, 0),
+    breaks = scales::breaks_pretty(),
+    labels = scales::number_format(accuracy = 1)
+  ) +
+  geom_vline(
+    xintercept = mean_all,
+    colour     = mean_color,
+    linetype   = "dashed",
+    linewidth  = 0.5
+  ) +
+  geom_vline(
+    xintercept = med_all,
+    colour     = median_color,
+    linetype   = "dashed",
+    linewidth  = 0.5
+  ) +
+  labs(
+    title    = "Wealth Distribution at Your Local Bar",
+    subtitle = "log₁₀ scale",
+    x        = "ealth (USD, log scale)",
+    y        = "Count"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_line(color = "grey90"),
+    panel.grid.major.x = element_blank(),
+    axis.line          = element_line(color = "black"),
+    axis.ticks         = element_line(color = "black"),
+    axis.ticks.length  = unit(0.2, "cm"),
+    axis.text.x        = element_text(angle = 45, hjust = 1),
+    plot.title         = element_text(margin = margin(b = 5))
+  )
+
+ggplotly(p_log_clean, height = 500, width = 750) %>%
+  layout(
+    margin      = list(t = 100),
+    annotations = list(
+      list(
+        x        = 0.95, y        = 0.9,
+        xref     = "paper", yref = "paper",
+        text     = annotation_with_bill,
+        showarrow= FALSE,
+        align    = "right",
+        font     = list(size = 18, color = "black")
+      )
+    )
+  )
+
+
+```
+
+
+---
+## Mean vs Median as Skew (σ) Rises
+
+```{r, distributions_mean_med, echo=FALSE, message=FALSE, warning=FALSE}
+library(plotly); library(dplyr)
+set.seed(42)
+
+sigma_seq <- seq(0, 5, by = 0.2)   # 0 = normal … 3 = extreme skew
+bw        <- 5                     # bin width
+x_max     <- 200                   # trim anything above this just for plotting
+
+frame_data <- function(s) {
+  x  <- rlnorm(700, meanlog = 2, sdlog = s)
+  x  <- pmin(x, x_max)                       # <-- clip long tail
+  br <- seq(0, x_max, by = bw)
+  h  <- hist(x, breaks = br, plot = FALSE)
+  data.frame(
+    sigma  = s,
+    bin    = h$mids,
+    cnt    = h$counts,
+    mean   = mean(x),
+    median = median(x)
+  )
+}
+
+df    <- bind_rows(lapply(sigma_seq, frame_data))
+max_y <- max(df$cnt)
+
+plot_ly(df) %>%
+  add_bars(
+    x = ~bin, y = ~cnt, frame = ~sigma,
+    ids = ~bin,
+    width = bw,                                # <- bars keep their girth
+    marker = list(color = "rgba(90,120,200,0.65)"),
+    showlegend = FALSE
+  ) %>%
+  add_segments(                                # mean
+    data = distinct(df, sigma, mean),
+    x = ~mean, xend = ~mean,
+    y = 0,     yend = max_y,
+    frame = ~sigma, ids = ~paste("mean", sigma),
+    line = list(color = "red", width = 2), showlegend = FALSE
+  ) %>%
+  add_segments(                                # median
+    data = distinct(df, sigma, median),
+    x = ~median, xend = ~median,
+    y = 0,       yend = max_y,
+    frame = ~sigma, ids = ~paste("med", sigma),
+    line = list(color = "blue", width = 2), showlegend = FALSE
+  ) %>%
+  layout(
+    barmode = "overlay",
+    xaxis   = list(title = "Value", range = c(0, x_max)),
+    yaxis   = list(title = "Count", range = c(0, max_y)),
+    title   = "Mean (red) vs Median (blue) as Skew Increases",
+    width   = 750, height = 500
+  ) %>%
+  layout(margin = list(t = 100))
+
+```
+
+---
+
+## 1. Applications of Mean vs Median
+
+- **Wealth and Income**  
+  *"Average net worth increased"* — but mostly billionaires; median person saw little change.
+
+- **Real Estate Prices**  
+  *"Average home price is \$800,000"* — driven by a few luxury sales; median much lower.
+
+- **Medical Costs**  
+  *"Average hospital bill is \$25,000"* — rare extreme cases inflate the mean.
+
+- **Life Expectancy**  
+  *"Average lifespan is 40 years"* — high infant mortality lowers the mean dramatically.
+
+- **Response Times for Emergency Services**  
+  *"Average ambulance arrival time is 8 minutes"* — median is often much shorter.
+
+- **GDP per Capita**  
+  *"GDP per person is \$60,000"* — but the median citizen earns far less in many countries.
+
+- **Asteroid Impact Energy**  
+  *Mean impact = “city-killer”* — dominated by once-in-a-million-years giants; median impact is a harmless fireball.
+
+- **Software Bug Fix Times**  
+  *"Average bug fix time is 15 days"* — most fixes happen quickly; a few linger for months.
+
+---
+
+
+
+## Mean or Median? &mdash; It Depends on the Shape of Your Data
+
+- **Symmetric (bell-shaped) distributions**  
+  *Mean ≈ Median* → either works  
+  <span style="font-size:0.9em;color:gray;">(heights, random errors, test scores in large classes)</span>
+
+- **Skewed distributions (long tail on one side)**  
+  **Use the Median** &nbsp;– it ignores extreme outliers  
+  <span style="font-size:0.9em;color:gray;">(wealth, medical bills, wait times)</span>
+
+- **Heavy-tailed or “black-swan” data**  
+  Median or percentiles are safest; mean can explode  
+  <span style="font-size:0.9em;color:gray;">(earthquake energy, insurance losses)</span>
+
+- **Bimodal / multi-cluster data**  
+  No single centre makes sense → show the full distribution or the two modes  
+  <span style="font-size:0.9em;color:gray;">(commuter travel times, exam grades with pass/fail peaks)</span>
+
+.small[
+*Rule of thumb ▶ If a handful of extreme observations could swing the result, report the **median** (and a spread measure) instead of the mean.*
+]
+
+---
+
+
+
+### From “What’s the Average?” → “What’s the Distribution?”
+
+- **Why the mean mis-led us:** the income data are **skewed**, so a few extreme values dragged the mean away from the typical person (≈ median).
+
+- **What really matters is the full shape** of the data—its **distribution**.
+
+- **Normal distribution (bell curve)**  
+  - Symmetric, mean = median = mode.  
+  - Central Limit Theorem ⇒ sample means often look normal.
+
+- **But many real-world data aren’t normal:**  
+  - Incomes/wealth → **log-normal / Pareto** (long right tail)  
+  - Failure times → **Weibull / Exponential** (many early, few late)  
+  - Web traffic, social-media posts, bug lifetimes … often heavy-tailed
+
+.small[
+**Takeaway ▶** Before quoting a single “average,” look at the distribution.  
+If it’s skewed or heavy-tailed, report the **median or percentiles** and pick the distribution that actually fits the data.
+]
+
+---
+
+## Bias
+
+**Bias** is the difference between the expected value of an estimator and the true value of the parameter it estimates.
+
+Formally:
+
+$$
+\text{Bias}(\hat{\theta}) = \mathbb{E}[\hat{\theta}] - \theta
+$$
+
+Where:
+- $\hat{\theta}$ = the **estimator** (your calculated estimate)
+- $\theta$ = the **true parameter** (the real value you want)
+- $\mathbb{E}[\hat{\theta}]$ = the **expected value** of the estimator (its long-run average over many samples)
+
+
+- If Bias = 0 → the estimator is **unbiased**.
+
+- If Bias ≠ 0 → the estimator is **biased** (systematically too high or too low).
+
+---
+
+Bias doesn’t just shift your first guess.
+It filters what you see next — making you even more biased over time
+
+
+Selection bias: The sample is not representative of the population.
+
+Omitted variable bias: Leaving out a variable that influences both the dependent and independent variables.
+
+Measurement bias (or information bias): Errors in how data is collected or recorded.
+
+Survivorship bias: Only analyzing "survivors" or those who remain, ignoring those who dropped out or failed.
+
+Recall bias: Errors because people remember things inaccurately (common in surveys and retrospective studies).
+
+Observer bias: Researcher's expectations subtly influence measurements or observations.
+
+Publication bias: Studies with "positive" results are more likely to be published than "null" or "negative" results.
+
+---
+
+## Bias
+
+### The Self-Reinforcing Feedback Loop of Bias
+
+
+```{r bias-feedback-loop1, echo=FALSE, message=FALSE, warning=FALSE}
+library(DiagrammeR)
+library(htmltools)
+
+graph <- grViz("
+digraph bias_loop {
+
+  graph [layout = circo]
+  node [shape = box, style = \"rounded,filled\", fontname = Helvetica, fontsize=12]
+
+  # Node Colors
+  CurrentBias [label = 'Current Bias', fillcolor = '#F5C4BB']        # lightest red
+  SelectiveAttention [label = 'Selective Attention', fillcolor = '#EDA89C'] # medium-light
+  SelectiveEvidence [label = 'Selective Evidence', fillcolor = '#E17A66']   # medium
+  ReinforcedBias [label = 'Reinforced Bias', fillcolor = '#C04E3D']          # strong bias (your mean_color)
+
+  edge [penwidth = 2]
+
+  CurrentBias -> SelectiveAttention
+  SelectiveAttention -> SelectiveEvidence
+  SelectiveEvidence -> ReinforcedBias
+  ReinforcedBias -> CurrentBias
+}
+")
+
+graph
+
+
+
+```
+
+---
+
+### Consequence of the Self-Reinforcing Feedback Loop of Bias
+
+Conceptual Edition
+
+```{r bias-feedback-loop3, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(dplyr)
+library(tibble)
+library(plotly)
+
+## parameters -----------------------------------------------------------
+time          <- 0:50
+r             <- 0.07
+truth_vals    <- rep(0, length(time))
+estimate_vals <- (1 + r)^time
+
+
+## cumulative data for the two animated lines ---------------------------
+cum_df <- bind_rows(lapply(time, function(t) {
+  tibble(
+    time_point = rep(0:t, 2),
+    value      = c(truth_vals[1:(t + 1)],
+                   estimate_vals[1:(t + 1)]),
+    series     = rep(c("Actual Value (Truth)", "Perceived Value (Biased)"), each = t + 1),
+    frame      = t
+  )
+}))
+
+## static dots only at t = 0 -------------------------------------------
+dot_df <- tibble(
+  time_point = c(0, 0),
+  value      = c(truth_vals[1], estimate_vals[1]),
+  series     = c("Actual Value (Truth)", "Perceived Value (Biased)"),
+  frame      = 0
+)
+
+## plot -----------------------------------------------------------------
+plot_ly(width = 700, height = 500) %>%
+  # show only the two starting dots at frame 0
+  add_markers(
+    data       = dot_df,
+    x          = ~time_point, y = ~value, frame = ~frame, ids = ~series,
+    color      = ~series,
+    colors     = c("Actual Value (Truth)" = median_color, "Perceived Value (Biased)" = mean_color),
+    marker     = list(size = 12),
+    showlegend = FALSE
+  ) %>%
+  # animate two lines (one per series) across frames
+  add_lines(
+    data        = cum_df,
+    x           = ~time_point, y = ~value, frame = ~frame, ids = ~series,
+    color       = ~series,
+    colors      = c("Actual Value (Truth)" = median_color, "Perceived Value (Biased)" = mean_color),
+    legendgroup = ~series,
+    line        = list(width = 4,shape="spline", smoothing=1.3)
+  ) %>%
+  layout(
+    title = list(text = NULL),
+    margin      = list(t = 50, r=25),
+    xaxis  = list(showline       = TRUE,
+                  zeroline       = FALSE,
+                  showticklabels = FALSE,
+                  title = "Time / Reinforcement cycles",
+                  ticks          = ""),
+    yaxis  = list(showline       = TRUE,
+                  zeroline       = FALSE,
+                  showticklabels = FALSE,
+                  title = "Bias",
+                  ticks          = ""),
+    legend = list(orientation = "h", x = 0.25, y = 1.1)
+  ) %>%
+  animation_opts(
+    frame      = 33,
+    transition = 30,
+    easing     = "linear",
+    redraw     = FALSE
+  ) %>%
+  animation_slider(currentvalue = list(prefix = "Time "))
+
+
+```
+
+
+---
+
+
+### Consequence of the Self-Reinforcing Feedback Loop of Bias
+
+Carnivore Edition
+
+```{r bias-feedback-carni2, echo=FALSE, message=FALSE, warning=FALSE}
+## parameters -----------------------------------------------------------
+time          <- 0:50
+r             <- 0.07
+truth_vals    <- rep(0, length(time))
+estimate_vals <- (1 + r)^time
+
+
+## cumulative data for the two animated lines ---------------------------
+cum_df <- bind_rows(lapply(time, function(t) {
+  tibble(
+    time_point = rep(0:t, 2),
+    value      = c(truth_vals[1:(t + 1)],
+                   estimate_vals[1:(t + 1)]),
+    series     = rep(c("Reality (Unbiased)", "Perceived Certainty (Biased)"), each = t + 1),
+    frame      = t
+  )
+}))
+
+## static dots only at t = 0 -------------------------------------------
+dot_df <- tibble(
+  time_point = c(0, 0),
+  value      = c(truth_vals[1], estimate_vals[1]),
+  series     = c("Reality (Unbiased)", "Perceived Certainty (Biased)"),
+  frame      = 0
+)
+
+## static plot ----------------------------------------------------------
+plot_ly(width = 750, height = 500) %>%
+  # plot the two starting dots
+  add_markers(
+    data       = dot_df,
+    x          = ~time_point, y = ~value, color = ~series,
+    colors     = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    marker     = list(size = 12),
+    showlegend = FALSE
+  ) %>%
+  # plot the full two lines
+  add_lines(
+    data        = cum_df,
+    x           = ~time_point, y = ~value, color = ~series,
+    colors      = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    legendgroup = ~series,
+    line        = list(width = 4, shape = "spline", smoothing = 1.3)
+  ) %>%
+  layout(
+    title = list(text = NULL),
+    margin      = list(t = 50, r=25),
+    xaxis  = list(showline       = TRUE,
+                  zeroline       = FALSE,
+                  showticklabels = FALSE,
+                  title = "Time / Reinforcement cycles",
+                  ticks          = ""),
+    yaxis  = list(showline       = TRUE,
+                  zeroline       = FALSE,
+                  showticklabels = FALSE,
+                  title = "Bias",
+                  ticks          = ""),
+    legend = list(orientation = "h", x = 0.15, y = 1.05)
+  ) %>%  layout(
+    shapes = list(
+      list(
+        type = "line", x0 = 1, x1 = 1,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 5, x1 = 5,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 15, x1 = 15,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 25, x1 = 25,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 35, x1 = 35,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 45, x1 = 45,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 50, x1 = 50,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      )
+    )
+  ) %>%
+  layout(
+    annotations = list(
+      list(
+        x = 1, y = max(estimate_vals) * 0.1,
+        text = "TikTok:\nMeat = Superfood", align = "left",
+        showarrow = FALSE, font = list(size = 12), xanchor = "left"
+      ),
+      list(
+        x = 5, y = max(estimate_vals) * 0.25,
+        text = "Plants Are\nTrying to\nKill You", align = "left",
+        showarrow = FALSE, font = list(size = 12), xanchor = "left"
+      ),
+      list(
+        x = 15, y = max(estimate_vals) * 0.375,
+        text = "Only Trust\nCarnivore\nSources", align = "left",
+        showarrow = FALSE, font = list(size = 12), xanchor = "left"
+      ),
+      list(
+        x = 25, y = max(estimate_vals) * 0.5,
+        text = "Fiber\n=\nIndustry Scam", align = "left",
+        showarrow = FALSE, font = list(size = 12), xanchor = "left"
+      ),
+      list(
+        x = 35, y = max(estimate_vals) * 0.625,
+        text = "Counter-evidence\n=\nConspiracy ", align = "left",
+        showarrow = FALSE, font = list(size = 12), xanchor = "left"
+      ),
+      list(
+        x = 45, y = max(estimate_vals) * 0.8,
+        text = "Humans\n=\nCarnivores", align = "left",
+        showarrow = FALSE, font = list(size = 12), xanchor = "left"
+      ),
+      list(
+        x = 50, y = max(estimate_vals) * 1,
+        text = "Raw\nOrgans\nOnly", align = "left",
+        showarrow = FALSE, font = list(size = 12), xanchor = "left"
+      )
+    )
+  )
+```
+
+---
+
+
+### Consequence of the Self-Reinforcing Feedback Loop of Bias
+
+Vegan Edition
+
+```{r bias-feedback-vegan2, echo=FALSE, message=FALSE, warning=FALSE}
+
+## static plot ----------------------------------------------------------
+plot_ly(width = 750, height = 500) %>%
+  # plot the two starting dots
+  add_markers(
+    data       = dot_df,
+    x          = ~time_point, y = ~value, color = ~series,
+    colors     = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    marker     = list(size = 12),
+    showlegend = FALSE
+  ) %>%
+  # plot the full two lines
+  add_lines(
+    data        = cum_df,
+    x           = ~time_point, y = ~value, color = ~series,
+    colors      = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    legendgroup = ~series,
+    line        = list(width = 4, shape = "spline", smoothing = 1.3)
+  ) %>%
+  layout(
+    title = list(text = NULL),
+    margin      = list(t = 50, r=25),
+    xaxis  = list(showline       = TRUE,
+                  zeroline       = FALSE,
+                  showticklabels = FALSE,
+                  title = "Time / Reinforcement cycles",
+                  ticks          = ""),
+    yaxis  = list(showline       = TRUE,
+                  zeroline       = FALSE,
+                  showticklabels = FALSE,
+                  title = "Bias",
+                  ticks          = ""),
+    legend = list(orientation = "h", x = 0.15, y = 1.05)
+  ) %>%  layout(
+    shapes = list(
+      list(
+        type = "line", x0 = 1, x1 = 1,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 5, x1 = 5,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 15, x1 = 15,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 25, x1 = 25,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 35, x1 = 35,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 45, x1 = 45,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      ),
+      list(
+        type = "line", x0 = 50, x1 = 50,
+        y0 = 0, y1 = max(estimate_vals) * 1.05,
+        line = list(color = "gray", dash = "dot", width = 2)
+      )
+    )
+  ) %>%
+layout(
+  annotations = list(
+    list(
+      x = 1, y = max(estimate_vals) * 0.1,
+      text = "TikTok:\nPlants = Superfoods", align = "left",
+      showarrow = FALSE, font = list(size = 12), xanchor = "left"
+    ),
+    list(
+      x = 5, y = max(estimate_vals) * 0.25,
+      text = "Meat Rots\nin Your\nColon", align = "left",
+      showarrow = FALSE, font = list(size = 12), xanchor = "left"
+    ),
+    list(
+      x = 15, y = max(estimate_vals) * 0.375,
+      text = "Only Trust\nVegan\nSources", align = "left",
+      showarrow = FALSE, font = list(size = 12), xanchor = "left"
+    ),
+    list(
+      x = 25, y = max(estimate_vals) * 0.5,
+      text = "Protein deficiency\n=\nIndustry Scam", align = "left",
+      showarrow = FALSE, font = list(size = 12), xanchor = "left"
+    ),
+    list(
+      x = 35, y = max(estimate_vals) * 0.625,
+      text = "Counter-evidence\n=\nConspiracy", align = "left",
+      showarrow = FALSE, font = list(size = 12), xanchor = "left"
+    ),
+    list(
+      x = 45, y = max(estimate_vals) * 0.8,
+      text = "Humans\n=\nVegans", align = "left",
+      showarrow = FALSE, font = list(size = 12), xanchor = "left"
+    ),
+    list(
+      x = 50, y = max(estimate_vals) * 1,
+      text = "Raw\nFruit\nOnly", align = "left",
+      showarrow = FALSE, font = list(size = 12), xanchor = "left"
+    )
+  )
+) 
+```
