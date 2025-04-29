@@ -20,10 +20,13 @@ output:
 ## 1. Mean vs Median
 
 ```{r before_plotly, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
 library(ggplot2)
 library(plotly)
 library(scales)
-
+library(dplyr)
+library(patchwork)
  #── simulate your data ─────────────────────────────────────────────────────
 set.seed(123)
 wealth_before <- rlnorm(50, meanlog = 11, sdlog = 0.4)
@@ -95,209 +98,38 @@ ggplotly(p_before, height = 500, width = 750) %>%
 
 ## 1. Mean vs Median
 
+
+### Impact of a $150B Outlier on Mean vs. Median — Across Sample Sizes
+
+
 ```{r after_plotly, echo=FALSE, message=FALSE, warning=FALSE}
-# ── only change: add Bill Gates’ wealth ─────────────────────────────
-# 3. compute the new stats including Bill’s 150 B
-all_wealths <- c(wealth_before, 150e9)
-mean_all    <- mean(all_wealths)
-med_all     <- median(all_wealths)
-
-# 4. build a new annotation text
-annotation_with_bill <- paste0(
-  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
-     format(round(mean_all), big.mark = ","),
-  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
-     format(round(med_all),  big.mark = ",")
-)
-
-# 5. re-draw exactly your old plot
-p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
-  geom_histogram(bins = 20, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
-  #geom_vline(xintercept = mean(wealth_before), colour = mean_color,   linewidth = 1) +
-  geom_vline(xintercept = median(wealth_before), colour = median_color, linewidth = 1, linetype   = "dashed") +
-  scale_x_continuous(labels = dollar_format()) +
-  scale_y_continuous(expand = c(0,0), limits = c(0,NA),
-                     breaks = scales::breaks_pretty(),
-                     labels = scales::number_format(accuracy = 1)) +
-  labs(title    = "Wealth Distribution at Your Local Bar",
-       subtitle = "mean ≈ median",
-       x        = "wealth (USD)", y = "Count") +
-  theme_minimal(base_size = 14) +
-  theme(panel.grid.major.y = element_line(color = "grey90"),
-        panel.grid.major.x = element_blank(),
-        axis.line           = element_line(color = "black"),
-        axis.ticks          = element_line(color = "black"),
-        axis.ticks.length   = unit(0.2, "cm"),
-        plot.title          = element_text(margin = margin(b = 5)))
-
-# 6. just swap in the new annotation text
-ggplotly(p_before, height = 500, width = 750) %>%
-  layout(
-    title = list(
-      text    = paste0("Wealth Distribution at Your Local Bar",
-                       "<br><sup>mean ≈ median</sup>"),
-      y       = 0.9, yanchor = "top"
-    ),
-    margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_with_bill,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
-  )
-
-```
-
----
-
-## 1. Mean vs Median
+df_summary <- readRDS("assets/wealth_with_bill.rds")
 
 
-```{r after_plotly2, echo=FALSE, message=FALSE, warning=FALSE}
-# ── only change: add Bill Gates’ wealth ─────────────────────────────
-#
-
-# 5. re-draw exactly your old plot
-p_before <- ggplot(data.frame(wealth = all_wealths), aes(wealth)) +
-  geom_histogram(
-    bins     = 50,
-    boundary = 0,           # ← force the first bin to start at 0
-    fill     = fill_color,
-    closed = "left",
-    color    = edge_color,
-    alpha    = 0.7
-  ) +
-  scale_x_continuous(
-    labels  = dollar_format(),
-    limits  = c(0, NA),     # ← drop any negative space
-    expand  = c(0, 0)       # ← tighten up to exactly 0 on the left
-  ) +
-  scale_y_continuous(
-    expand  = c(0, 0),
-    limits  = c(0, NA),
-    breaks  = scales::breaks_pretty(),
-    labels  = scales::number_format(accuracy = 1)
-  ) +
-  geom_vline(xintercept = mean(mean_all),  colour = mean_color,   linewidth = 0.5, linetype   = "dashed") +
-  geom_vline(xintercept = median(med_all), colour = median_color, linewidth = 0.5, linetype   = "dashed") +
-  labs(
-    title    = "Wealth Distribution at Your Local Bar",
-    subtitle = "mean ≈ median",
-    x        = "wealth (USD)", y = "Count"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    panel.grid.major.y = element_line(color = "grey90"),
-    panel.grid.major.x = element_blank(),
-    axis.line          = element_line(color = "black"),
-    axis.ticks         = element_line(color = "black"),
-    axis.ticks.length  = unit(0.2, "cm"),
-    plot.title         = element_text(margin = margin(b = 5))
-  )
-
-# 6. just swap in the new annotation text
-ggplotly(p_before, height = 500, width = 750) %>%
-  layout(
-    title = list(
-      text    = paste0("Wealth Distribution at Your Local Bar",
-                       "<br><sup>mean ≈ median</sup>"),
-      y       = 0.9, yanchor = "top"
-    ),
-    margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_with_bill,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
-  )
-
-```
-
----
-
-## 1. Mean vs Median
-
-```{r after_plotly3, echo=FALSE, message=FALSE, warning=FALSE}
-
-p_log_clean <- ggplot(data.frame(wealth = all_wealths), aes(wealth)) +
-  geom_histogram(
-    bins  = 20,
-    fill  = fill_color,
-    color = edge_color,
-    alpha = 0.7
-  ) +
-  scale_x_log10(
-    # pick the powers of ten you want
-    breaks = c(1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11),
-    # and supply matching, SI‐style labels
-    labels = c("$100K", "$1M", "$10M", "$100M", "$1B", "$10B", "$100B"),
-    expand = expansion(mult = 0.02)
-  ) +
-  annotation_logticks(sides = "b") +
-  scale_y_continuous(
-    expand = c(0, 0),
-    breaks = scales::breaks_pretty(),
-    labels = scales::number_format(accuracy = 1)
-  ) +
-  geom_vline(
-    xintercept = mean_all,
-    colour     = mean_color,
-    linetype   = "dashed",
-    linewidth  = 0.5
-  ) +
-  geom_vline(
-    xintercept = med_all,
-    colour     = median_color,
-    linetype   = "dashed",
-    linewidth  = 0.5
-  ) +
-  labs(
-    title    = "Wealth Distribution at Your Local Bar",
-    subtitle = "log₁₀ scale",
-    x        = "ealth (USD, log scale)",
-    y        = "Count"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    panel.grid.major.y = element_line(color = "grey90"),
-    panel.grid.major.x = element_blank(),
-    axis.line          = element_line(color = "black"),
-    axis.ticks         = element_line(color = "black"),
-    axis.ticks.length  = unit(0.2, "cm"),
-    axis.text.x        = element_text(angle = 45, hjust = 1),
-    plot.title         = element_text(margin = margin(b = 5))
-  )
-
-ggplotly(p_log_clean, height = 500, width = 750) %>%
-  layout(
-    margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_with_bill,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
-  )
-
+df_summary %>%
+  mutate(
+    `Sample Size` = format(n, big.mark = ","),
+    `Mean` = paste0("$", format(round(mean_val), big.mark = ",")),
+    `Median` = paste0("$", format(round(median_val), big.mark = ","))
+  ) %>%
+  select(`Sample Size`, `Mean`, `Median`) %>%
+  kable(align = c("r", "r", "r"), booktabs = TRUE) %>%
+  kable_styling(font_size = 24, full_width = TRUE
+) %>%
+  column_spec(2, extra_css = "padding-left: 20px;") %>%
+  column_spec(3, extra_css = "padding-left: 20px;")
 
 ```
 
 
+
 ---
+
+
+![](assets/wealth_patchwork.png)
+
+---
+
 
 ## Mean vs Median as Skew (σ) Rises
 
@@ -358,6 +190,74 @@ plot_ly(df) %>%
   layout(margin = list(t = 100))
 
 ```
+
+---
+
+---  
+
+##  Mean vs Median as "n" grows  
+
+```{r setup_data, include=FALSE, echo=FALSE}
+
+library(dplyr)
+library(purrr)
+set.seed(123)
+
+# ─ your sample sizes (100, 1 000, 10 000, 100 000; extend as needed) ─
+ns     <- 10^(2:5)
+bill   <- 150e9
+
+# ─ draw the largest once ─────────────────────────────────────────────────
+wealth_master <- rlnorm(max(ns), meanlog = 11, sdlog = 0.4)
+
+# ─ compute mean/median for each n + Bill ─────────────────────────────────
+df <- tibble(n = ns) %>%
+  mutate(
+    sample     = map(n, ~ wealth_master[1:.x]),
+    all_vals   = map(sample, ~ c(.x, bill))
+  ) %>%
+  rowwise() %>%
+  mutate(
+    mean_val   = mean(all_vals),
+    median_val = median(all_vals)
+  ) %>%
+  ungroup() %>%
+  select(n, mean_val, median_val)
+
+
+# ─ colors ────────────────────────────────────────────────────────────────
+mean_col   <- "#C04E3D"
+median_col <- "#BFA06D"
+
+
+```
+
+
+```{r mean_med_n_data, include=FALSE, echo=FALSE, results='asis'}
+
+slide_text <- purrr::map_chr(seq_len(nrow(df)), function(i) {
+  paste0(
+    "---\n\n",
+    "## Number of people + Bill Gates: ", format(df$n[i], big.mark = ","), "\n\n",
+    "<p><span style='color:", mean_col, "'><strong>Mean:</strong></span> $",
+      format(round(df$mean_val[i]), big.mark = ","), "</p>\n\n",
+    "<p><span style='color:", median_col, "'><strong>Median:</strong></span> $",
+      format(round(df$median_val[i]), big.mark = ","), "</p>\n"
+  )
+})
+
+cat(slide_text, sep = "\n")
+
+```
+
+---
+
+## Number of people + Bill Gates: 10,000
+
+<p><span style='color:#C04E3D'><strong>Mean:</strong></span> $1,662,250</p>
+
+<p><span style='color:#BFA06D'><strong>Median:</strong></span> $57,983</p>
+
 
 ---
 
