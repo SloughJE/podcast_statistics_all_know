@@ -23,7 +23,10 @@ df <- tibble(n = ns) %>%
   ) %>%
   ungroup()
 
-saveRDS(df, "/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/wealth_with_bill.rds")
+summary_df <- df %>%
+  select(n, mean_val, median_val)
+summary_df$n = summary_df$n+1
+saveRDS(summary_df, "/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/wealth_with_bill.rds")
 
 
 #################
