@@ -26,7 +26,7 @@ class: inverse, center, large
 <hr style="margin-top: 2em; margin-bottom: 2em;">
 
 --
-<h2 style="font-size: 60px;">It Can Be Mean</h2>
+<h2 style="font-size: 60px;">It's Meaner than the Median</h2>
 
 ---
 
@@ -165,6 +165,19 @@ ggplotly(p_before, height = 450, width = 750) %>%
 ## 1. Mean vs Median
 
 
+
+<div style="font-size: 130%; text-align: left; margin: 100px 0;">
+  <p><strong>Mean</strong>: Sum of all values divided by the number of values.</p>
+  <br>
+  <p><strong>Median</strong>: Middle value when the values are ordered.</p>
+</div>
+
+---
+
+
+## 1. Mean vs Median
+
+
 ### Impact of a $150B Outlier on Mean vs. Median — Across Sample Sizes
 
 
@@ -191,170 +204,48 @@ df_summary %>%
 
 ---
 
+## 1. Mean vs Median
+
+A more realistic example
 
 ![](assets/wealth_patchwork.png)
 
 ---
+.pull-left[
+### Economics & Wealth  
+- GDP per capita  
+- household income  
+- net worth  
+- home price  
+- monthly rent  
+- CEO compensation  
 
+### Health & Healthcare  
+- life expectancy
+- healthcare spending per person  
+- hospital bill  
+- patient out-of-pocket cost 
 
-## Mean vs Median as Skew (σ) Rises
+]
 
-```{r, distributions_mean_med, echo=FALSE, message=FALSE, warning=FALSE}
-library(plotly); library(dplyr)
-set.seed(42)
+.pull-right[
+### Academics
+- test score (SAT, PISA)  
+- GPA  
+- academic citations
+- speaking invitations per expert
 
-sigma_seq <- seq(0, 5, by = 0.2)   # 0 = normal … 3 = extreme skew
-bw        <- 5                     # bin width
-x_max     <- 200                   # trim anything above this just for plotting
-
-frame_data <- function(s) {
-  x  <- rlnorm(700, meanlog = 2, sdlog = s)
-  x  <- pmin(x, x_max)                       # <-- clip long tail
-  br <- seq(0, x_max, by = bw)
-  h  <- hist(x, breaks = br, plot = FALSE)
-  data.frame(
-    sigma  = s,
-    bin    = h$mids,
-    cnt    = h$counts,
-    mean   = mean(x),
-    median = median(x)
-  )
-}
-
-df    <- bind_rows(lapply(sigma_seq, frame_data))
-max_y <- max(df$cnt)
-
-plot_ly(df) %>%
-  add_bars(
-    x = ~bin, y = ~cnt, frame = ~sigma,
-    ids = ~bin,
-    width = bw,                                # <- bars keep their girth
-    marker = list(color = "rgba(90,120,200,0.65)"),
-    showlegend = FALSE
-  ) %>%
-  add_segments(                                # mean
-    data = distinct(df, sigma, mean),
-    x = ~mean, xend = ~mean,
-    y = 0,     yend = max_y,
-    frame = ~sigma, ids = ~paste("mean", sigma),
-    line = list(color = "red", width = 2), showlegend = FALSE
-  ) %>%
-  add_segments(                                # median
-    data = distinct(df, sigma, median),
-    x = ~median, xend = ~median,
-    y = 0,       yend = max_y,
-    frame = ~sigma, ids = ~paste("med", sigma),
-    line = list(color = "blue", width = 2), showlegend = FALSE
-  ) %>%
-  layout(
-    barmode = "overlay",
-    xaxis   = list(title = "Value", range = c(0, x_max)),
-    yaxis   = list(title = "Count", range = c(0, max_y)),
-    title   = "Mean (red) vs Median (blue) as Skew Increases",
-    width   = 750, height = 500
-  ) %>%
-  layout(margin = list(t = 100))
-
-```
+### Other
+- commute time  
+- screen-time per user  
+- household energy use  
+- carbon emissions per capita  
+- YouTube ad revenue per channel
+- revenue per app in the App Store
+- Software Bug Fix Times
+]
 
 ---
-
----  
-
-##  Mean vs Median as "n" grows  
-
-```{r setup_data, include=FALSE, echo=FALSE}
-
-library(dplyr)
-library(purrr)
-set.seed(123)
-
-# ─ your sample sizes (100, 1 000, 10 000, 100 000; extend as needed) ─
-ns     <- 10^(2:5)
-bill   <- 150e9
-
-# ─ draw the largest once ─────────────────────────────────────────────────
-wealth_master <- rlnorm(max(ns), meanlog = 11, sdlog = 0.4)
-
-# ─ compute mean/median for each n + Bill ─────────────────────────────────
-df <- tibble(n = ns) %>%
-  mutate(
-    sample     = map(n, ~ wealth_master[1:.x]),
-    all_vals   = map(sample, ~ c(.x, bill))
-  ) %>%
-  rowwise() %>%
-  mutate(
-    mean_val   = mean(all_vals),
-    median_val = median(all_vals)
-  ) %>%
-  ungroup() %>%
-  select(n, mean_val, median_val)
-
-
-# ─ colors ────────────────────────────────────────────────────────────────
-mean_col   <- "#C04E3D"
-median_col <- "#BFA06D"
-
-
-```
-
-
-```{r mean_med_n_data, include=FALSE, echo=FALSE, results='asis'}
-
-slide_text <- purrr::map_chr(seq_len(nrow(df)), function(i) {
-  paste0(
-    "---\n\n",
-    "## Number of people + Bill Gates: ", format(df$n[i], big.mark = ","), "\n\n",
-    "<p><span style='color:", mean_col, "'><strong>Mean:</strong></span> $",
-      format(round(df$mean_val[i]), big.mark = ","), "</p>\n\n",
-    "<p><span style='color:", median_col, "'><strong>Median:</strong></span> $",
-      format(round(df$median_val[i]), big.mark = ","), "</p>\n"
-  )
-})
-
-cat(slide_text, sep = "\n")
-
-```
-
----
-
-## Number of people + Bill Gates: 10,000
-
-<p><span style='color:#C04E3D'><strong>Mean:</strong></span> $1,662,250</p>
-
-<p><span style='color:#BFA06D'><strong>Median:</strong></span> $57,983</p>
-
-
----
-
-## 1. Applications of Mean vs Median
-
-- **Wealth and Income**  
-  *"Average net worth increased"* — but mostly billionaires; median person saw little change.
-
-- **Real Estate Prices**  
-  *"Average home price is \$800,000"* — driven by a few luxury sales; median much lower.
-
-- **Medical Costs**  
-  *"Average hospital bill is \$25,000"* — rare extreme cases inflate the mean.
-
-- **Life Expectancy**  
-  *"Average lifespan is 40 years"* — high infant mortality lowers the mean dramatically.
-
-- **Response Times for Emergency Services**  
-  *"Average ambulance arrival time is 8 minutes"* — median is often much shorter.
-
-- **GDP per Capita**  
-  *"GDP per person is \$60,000"* — but the median citizen earns far less in many countries.
-
-- **Asteroid Impact Energy**  
-  *Mean impact = “city-killer”* — dominated by once-in-a-million-years giants; median impact is a harmless fireball.
-
-- **Software Bug Fix Times**  
-  *"Average bug fix time is 15 days"* — most fixes happen quickly; a few linger for months.
-
----
-
 
 
 ## Mean or Median? &mdash; It Depends on the Shape of Your Data
