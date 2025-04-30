@@ -14,6 +14,8 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+      includes:
+        after_body: "libs/remark-css/default.css"
 
 ---
 
@@ -104,7 +106,7 @@ ggplotly(p_before, height = 450, width = 750) %>%
 
 ## 1. Mean vs Median
 
-### Local bar weath distribution: 50 Patrons + Bill Gates
+### Local bar weath distribution: 50 Patrons + Billon Gezos 
 ```{r after_plotly, echo=FALSE, message=FALSE, warning=FALSE}
 
 
@@ -130,7 +132,7 @@ p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
                      breaks = scales::breaks_pretty(),
                      labels = scales::number_format(accuracy = 1)) +
   labs(title    = "Wealth Distribution at Your Local Bar",
-       subtitle = "mean ≈ median",
+       subtitle = "mean ≠ median",
        x        = "wealth (USD)", y = "Count") +
   theme_minimal(base_size = 14) +
   theme(panel.grid.major.y = element_line(color = "grey90"),
@@ -247,62 +249,246 @@ A more realistic example
 
 ---
 
+## 1. Mean vs Median
 
-## Mean or Median? &mdash; It Depends on the Shape of Your Data
+### Pareto Distribution
 
-- **Symmetric (bell-shaped) distributions**  
-  *Mean ≈ Median* → either works  
-  <span style="font-size:0.9em;color:gray;">(heights, random errors, test scores in large classes)</span>
+```{r pareto_full, echo=FALSE, message=FALSE, warning=FALSE}
 
-- **Skewed distributions (long tail on one side)**  
-  **Use the Median** &nbsp;– it ignores extreme outliers  
-  <span style="font-size:0.9em;color:gray;">(wealth, medical bills, wait times)</span>
+library(VGAM)
 
-- **Heavy-tailed or “black-swan” data**  
-  Median or percentiles are safest; mean can explode  
-  <span style="font-size:0.9em;color:gray;">(earthquake energy, insurance losses)</span>
+wealth_pareto <- rpareto(100000, scale = 10000, shape = 1.03)  # shape < 2 → heavy tail
 
-- **Bimodal / multi-cluster data**  
-  No single centre makes sense → show the full distribution or the two modes  
-  <span style="font-size:0.9em;color:gray;">(commuter travel times, exam grades with pass/fail peaks)</span>
 
-.small[
-*Rule of thumb ▶ If a handful of extreme observations could swing the result, report the **median** (and a spread measure) instead of the mean.*
-]
+mean_b <- mean(wealth_pareto)
+med_b  <- median(wealth_pareto)
+
+annotation_text <- paste0(
+  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
+  format(round(mean_b), big.mark = ","), 
+  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
+  format(round(med_b),  big.mark = ",")
+)
+
+p_pareto <- ggplot(data.frame(wealth = wealth_pareto), aes(wealth)) +
+  geom_histogram(bins = 100, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
+  geom_vline(xintercept = mean(wealth_pareto), colour = mean_color,   linewidth = 1,  linetype   = "dashed") +
+  geom_vline(xintercept = median(wealth_pareto), colour = median_color, linewidth = 1, linetype   = "dashed") +
+  scale_x_continuous(labels = dollar_format()) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,NA),
+                     breaks = scales::breaks_pretty(),
+                     labels = scales::label_comma()) +
+  labs(title    = "mean ≠ median", x= "wealth (USD)", y = "Count") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid.major.y = element_line(color = "grey90"),
+        panel.grid.major.x = element_blank(),
+        axis.line           = element_line(color = "black"),
+        axis.ticks          = element_line(color = "black"),
+        axis.ticks.length   = unit(0.2, "cm"),
+        plot.title          = element_text(margin = margin(b = 5)))
+
+
+ggplotly(p_pareto, height = 450, width = 750) %>%
+  layout(
+    title = list(
+      text    = paste0("mean ≠ median"),
+      y       = 0.9, yanchor = "top"
+    ),
+    margin      = list(t = 100),
+    annotations = list(
+      list(
+        x        = 0.95, y        = 0.9,
+        xref     = "paper", yref = "paper",
+        text     = annotation_text,
+        showarrow= FALSE,
+        align    = "right",
+        font     = list(size = 18, color = "black")
+      )
+    )
+  )
+  
+```
+  
+
+---
+
+## 1. Mean vs Median
+
+### Pareto Distribution (x-axis limited)
+
+
+```{r pareto_lim, echo=FALSE, message=FALSE, warning=FALSE}
+
+p_pareto <- ggplot(data.frame(wealth = wealth_pareto), aes(wealth)) +
+  geom_histogram(bins = 50, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
+  geom_vline(xintercept = mean(wealth_pareto), colour = mean_color,   linewidth = 1,  linetype   = "dashed") +
+  geom_vline(xintercept = median(wealth_pareto), colour = median_color, linewidth = 1, linetype   = "dashed") +
+  scale_x_continuous(labels = dollar_format(), limits = c(0, 100000)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,NA),
+                     breaks = scales::breaks_pretty(),
+                     labels = scales::label_comma()) +
+  labs(title    = "mean ≠ median", x= "wealth (USD)", y = "Count") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid.major.y = element_line(color = "grey90"),
+        panel.grid.major.x = element_blank(),
+        axis.line           = element_line(color = "black"),
+        axis.ticks          = element_line(color = "black"),
+        axis.ticks.length   = unit(0.2, "cm"),
+        plot.title          = element_text(margin = margin(b = 5)))
+
+
+ggplotly(p_pareto, height = 450, width = 750) %>%
+  layout(
+    title = list(
+      text    = paste0("mean ≠ median"),
+      y       = 0.9, yanchor = "top"
+    ),
+    margin      = list(t = 100),
+    annotations = list(
+      list(
+        x        = 0.95, y        = 0.9,
+        xref     = "paper", yref = "paper",
+        text     = annotation_text,
+        showarrow= FALSE,
+        align    = "right",
+        font     = list(size = 18, color = "black")
+      )
+    )
+  )
+
+```
+
+---
+
+## 1. Mean vs Median
+
+### Normal Distribution
+
+
+```{r normal_dist, echo=FALSE, message=FALSE, warning=FALSE}
+
+wealth_normal <- rnorm(100000, mean = 90000, sd = 25000)
+
+
+mean_b <- mean(wealth_normal)
+med_b  <- median(wealth_normal)
+
+annotation_text <- paste0(
+  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
+  format(round(mean_b), big.mark = ","), 
+  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
+  format(round(med_b),  big.mark = ",")
+)
+
+p_pareto <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
+  geom_histogram(bins = 50, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
+  geom_vline(xintercept = mean(wealth_normal), colour = mean_color,   linewidth = 1) +
+  geom_vline(xintercept = median(wealth_normal), colour = median_color, linewidth = 1, linetype   = "dashed") +
+  scale_x_continuous(labels = dollar_format()) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,NA),
+                     breaks = scales::breaks_pretty(),
+                     labels = scales::label_comma()) +
+  labs(title    = "mean ≈ median", x= "wealth (USD)", y = "Count") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid.major.y = element_line(color = "grey90"),
+        panel.grid.major.x = element_blank(),
+        axis.line           = element_line(color = "black"),
+        axis.ticks          = element_line(color = "black"),
+        axis.ticks.length   = unit(0.2, "cm"),
+        plot.title          = element_text(margin = margin(b = 5)))
+
+
+ggplotly(p_pareto, height = 450, width = 750) %>%
+  layout(
+    title = list(
+      text    = paste0("mean ≈ median"),
+      y       = 0.9, yanchor = "top"
+    ),
+    margin      = list(t = 100),
+    annotations = list(
+      list(
+        x        = 0.95, y        = 0.9,
+        xref     = "paper", yref = "paper",
+        text     = annotation_text,
+        showarrow= FALSE,
+        align    = "right",
+        font     = list(size = 18, color = "black")
+      )
+    )
+  )
+
+```
+
+---
+## 1. Mean vs Median
+
+<br>
+
+## Extreme Outliers 
+<br>
+
+--
+
+## Symmetric vs Skewed
+<br>
+
+
+--
+
+
+## the Shape of the Data
+
+---
+class: inverse, center, large
+
+
+<h1 style="font-size: 80px; margin-top: 200px;">Distributions</h1>
+
+<hr style="margin-top: 2em; margin-bottom: 2em;">
+
+--
+<h2 style="font-size: 60px;">The Foundation Beneath Every Statistic</h2>
+
+
+---
+
+## 2. Distributions
+
+### Theoretical models of where values are likely to occur
+
+- **Symmetry vs. Skewness**  
+  Are values evenly spread around the center, or do they stretch more in one direction?
+
+- **Variability (Spread)**  
+  How tightly or widely are the values clustered?
+
+- **Tail Behavior**  
+  How likely are extreme or outlier values?
 
 ---
 
 
+![](assets/dist_continuous.png)
 
-### From “What’s the Average?” → “What’s the Distribution?”
-
-- **Why the mean mis-led us:** the income data are **skewed**, so a few extreme values dragged the mean away from the typical person (≈ median).
-
-- **What really matters is the full shape** of the data—its **distribution**.
-
-- **Normal distribution (bell curve)**  
-  - Symmetric, mean = median = mode.  
-  - Central Limit Theorem ⇒ sample means often look normal.
-
-- **But many real-world data aren’t normal:**  
-  - Incomes/wealth → **log-normal / Pareto** (long right tail)  
-  - Failure times → **Weibull / Exponential** (many early, few late)  
-  - Web traffic, social-media posts, bug lifetimes … often heavy-tailed
-
-.small[
-**Takeaway ▶** Before quoting a single “average,” look at the distribution.  
-If it’s skewed or heavy-tailed, report the **median or percentiles** and pick the distribution that actually fits the data.
-]
 
 ---
 
-## Distributions
+
+![](assets/dist_discrete.png)
+
+---
+
+## 3. Correlation, Causation, Confounding
 
 ### Types and Skew
 
 ---
 
-## Bias
+## 3. Linear and Non-Linear Effects
+
+---
+
+## 4. Bias
 
 **Bias** is the difference between the expected value of an estimator and the true value of the parameter it estimates.
 
@@ -344,7 +530,7 @@ Publication bias: Studies with "positive" results are more likely to be publishe
 
 ---
 
-## Bias
+## 4. Bias
 
 ### The Self-Reinforcing Feedback Loop of Bias
 
