@@ -148,7 +148,9 @@ ggsave(
   width = 12, height = 8, dpi = 1200
 ) 
 
-
+############################
+# DISTRIBUTIONS!!!###########
+############################
 
 make_dist_plot <- function(dist_fun, ...,
                            discrete = FALSE,
@@ -157,12 +159,20 @@ make_dist_plot <- function(dist_fun, ...,
                            n_sample = 1e5,
                            xlim     = NULL) {
   
+  # Default xlim for continuous if not set
+  if (!discrete && is.null(xlim)) {
+    xlim <- c(-10, 10)
+  }
+  
   x <- dist_fun(n_sample, ...)
-  if (!is.null(xlim)) x <- x[x >= xlim[1] & x <= xlim[2]]
+  if (!discrete && !is.null(xlim)) {
+    x <- x[x >= xlim[1] & x <= xlim[2]]
+  }
+  
   df <- data.frame(x)
   
   p <- ggplot(df, aes(x)) +
-    {                       # <- wrap the if/else inside braces
+    {
       if (discrete) {
         geom_bar(
           aes(y = after_stat(count / max(count))),
@@ -181,15 +191,39 @@ make_dist_plot <- function(dist_fun, ...,
       axis.title = element_blank(),
       axis.text  = element_blank(),
       axis.ticks = element_blank(),
-      plot.title = element_text(size = 12, hjust = 0.5, vjust = 0.3),
+      plot.title = element_text(size = 16, hjust = 0.5, vjust = -1),
       panel.grid = element_blank()
-    ) +
-    ylim(0, 1.05)
+    )
   
-  if (!is.null(xlim))
+  if (!discrete)
+    p <- p + ylim(0, 1.05)
+  
+  if (!discrete && !is.null(xlim))
     p <- p + coord_cartesian(xlim = xlim, expand = FALSE)
   
   p
+}
+
+
+# uniform treat specially
+make_uniform_plot <- function(min_val = -1, max_val = 1, title = "Cont. Uniform") {
+  df <- data.frame(x = c(min_val, max_val), y = 1)
+  
+  ggplot() +
+    geom_ribbon(aes(x = x, ymin = 0, ymax = 1), fill = "skyblue", alpha = 0.6,
+                data = data.frame(x = seq(min_val, max_val, length.out = 100))) +
+    geom_segment(aes(x = min_val, xend = max_val, y = 1, yend = 1), color = "black") +
+    labs(title = title) +
+    theme_minimal(base_size = 12) +
+    theme(
+      axis.title = element_blank(),
+      axis.text  = element_blank(),
+      axis.ticks = element_blank(),
+      plot.title = element_text(size = 16, hjust = 0.5, vjust = -1),
+      panel.grid = element_blank(),
+      plot.margin = margin(0, 0, 0, 0, "pt")
+    ) +
+    ylim(0, 1.05)
 }
 
 
@@ -201,16 +235,17 @@ p_normal     <- make_dist_plot(rnorm, mean = 0, sd = 1,               title = "N
 p_expon      <- make_dist_plot(rexp, rate = 1,                        title = "Exponential",     adjust = 2.0)
 p_chisq      <- make_dist_plot(rchisq, df = 3,                        title = "Chi-Squared",     adjust = 2.0)
 p_gamma      <- make_dist_plot(rgamma, shape = 2, scale = 2,          title = "Gamma",           adjust = 2.0)
-p_beta       <- make_dist_plot(rbeta, 2, 5,                           title = "Beta",            adjust = 2.5)
+#p_beta       <- make_dist_plot(rbeta, 2, 5,                           title = "Beta",            adjust = 2.5)
 p_t          <- make_dist_plot(rt, df = 5,                            title = "t",               adjust = 1.8)
 p_log_normal <- make_dist_plot(rlnorm, meanlog = 0, sdlog = 0.5,      title = "Log-Normal",      adjust = 2.0)
 p_weibull    <- make_dist_plot(rweibull, shape = 1.5, scale = 1,      title = "Weibull",         adjust = 2.0)
-p_cont_uniform <- make_dist_plot(runif, min = 0, max = 1,             title = "Cont. Uniform",   adjust = 2.0)
+p_cont_uniform <- make_uniform_plot(min_val = -10, max_val = 10, title = "Cont. Uniform")
 p_laplace    <- make_dist_plot(function(n) rlaplace(n, 0, 1),         title = "Laplace",         adjust = 1.8)
 p_logistic <- make_dist_plot(rlogis, location = 0, scale = 1, title = "Logistic", adjust = 1.8)
 p_cauchy <- make_dist_plot(rcauchy, location = 0, scale = 1, title    = "Cauchy",adjust   = 0.9, xlim = c(-20, 20))
-p_pareto <- make_dist_plot(rpareto, scale = 10000, shape    = 1, n_sample = n_sample, title    = "Pareto (log scale)",adjust   = 2)+  scale_x_log10(expand = c(0,0))
+p_pareto <- make_dist_plot(rpareto, scale = 10000, shape    = 1, n_sample = n_sample, title    = "Pareto (log scale)",xlim     = c(1e2, 1e6), adjust   = 2)+  scale_x_log10(expand = c(0,0))
 
+##
 
 # Discrete
 p_binomial   <- make_dist_plot(rbinom, size = 10, prob = 0.5,         title = "Binomial",       discrete = TRUE)
@@ -218,16 +253,25 @@ p_poisson    <- make_dist_plot(rpois, lambda = 3,                     title = "P
 p_geometric  <- make_dist_plot(rgeom, prob = 0.3,                     title = "Geometric",      discrete = TRUE)
 p_nbinom     <- make_dist_plot(rnbinom, size = 5, prob = 0.5,         title = "Neg. Binomial",  discrete = TRUE)
 p_hypergeom  <- make_dist_plot(rhyper, m = 30, n = 70, k = 10,        title = "Hypergeometric", discrete = TRUE)
-p_discrete_uniform <- make_dist_plot(function(n) sample(0:10, n, replace = TRUE), 
-                                     title = "Discrete Uniform",      discrete = TRUE)
+p_discrete_uniform <- make_dist_plot(function(n) sample(0:9, n, replace = TRUE), 
+                                     title = "Discrete Uniform",      discrete = TRUE) +
+  scale_x_continuous(breaks = 0:10, expand = c(0.1, 0))
 p_bernoulli <- make_dist_plot(rbinom, size = 1, prob = 0.3, title     = "Bernoulli", discrete  = TRUE)
+
 zipf_sampler <- function(n, s = 1.1, N = 100) {
   ranks <- 1:N
   probs <- ranks^(-s)
   probs <- probs / sum(probs)
   sample(ranks, n, replace = TRUE, prob = probs)
 }
-p_zipf <- make_dist_plot(zipf_sampler,title = "Zipf–Mandelbrot", discrete = TRUE, xlim = c(0, 50))
+
+p_zipf <- make_dist_plot(
+  zipf_sampler,
+  title = "Zipf–Mandelbrot",
+  discrete = TRUE
+) +
+  coord_cartesian(xlim = c(1, 50)) +
+  theme(axis.text.x = element_blank()) + xlim(0,50)
 
 library(patchwork)
 
@@ -239,7 +283,7 @@ trim <- function(p) p + theme(plot.margin = margin(0,0,0,0,"pt"))
 p1 <- p_normal + 
   labs(y = "Symmetric") +
   theme(
-    axis.title.y     = element_text(angle = 0, vjust = 0.5, hjust = 0.5,face   = "bold",
+    axis.title.y     = element_text(angle = 0, vjust = 0.5, hjust = 0.5,face   = "bold", size = 18,
                                     margin = margin(r = 8)), 
     axis.text.y      = element_blank(),
     axis.ticks.y     = element_blank()
@@ -248,7 +292,7 @@ p1 <- p_normal +
 p2 <- p_expon + 
   labs(y = "Skewed") +
   theme(
-    axis.title.y     = element_text(angle = 0, vjust = 0.5, hjust = 0.5, face   = "bold",
+    axis.title.y     = element_text(angle = 0, vjust = 0.5, hjust = 0.5, face   = "bold", size = 18,
                                     margin = margin(r = 8)),
     axis.text.y      = element_blank(),
     axis.ticks.y     = element_blank()
@@ -294,7 +338,7 @@ ggsave(
 p_fix1 <- p_binomial +
   labs(y = "Fixed trials") +
   theme(
-    axis.title.y = element_text(face = "bold", angle = 0,
+    axis.title.y = element_text(face = "bold", angle = 0, size = 18,
                                 vjust = 0.5, hjust = 0.5,
                                 margin = margin(r = 8)),
     axis.text.y  = element_blank(),
@@ -303,11 +347,12 @@ p_fix1 <- p_binomial +
 
 p_fix2 <- trim(p_hypergeom)
 p_fix3 <- trim(p_discrete_uniform)
+p_fix4 = trim(p_bernoulli)
 
 p_cnt1 <- p_poisson +
   labs(y = "Counting events") +
   theme(
-    axis.title.y = element_text(face = "bold", angle = 0,
+    axis.title.y = element_text(face = "bold", angle = 0, size = 18,
                                 vjust = 0.5, hjust = 0.5,
                                 margin = margin(r = 8)),
     axis.text.y  = element_blank(),
@@ -316,9 +361,10 @@ p_cnt1 <- p_poisson +
 
 p_cnt2 <- trim(p_geometric)
 p_cnt3 <- trim(p_nbinom)
+p_cnt4 = trim(p_zipf)
 
-p_fix1 <- p_fix1 + theme(plot.margin = margin(0, 0, 20, 0))        # 15pt below row 1
-p_fix2 <- p_fix2 + theme(plot.margin = margin(20, 0, 0, 0))       # 15pt above and below row 2
+p_fix1 <- p_fix1 + theme(plot.margin = margin(0, 0, 20, 0))        
+p_fix2 <- p_fix2 + theme(plot.margin = margin(20, 0, 0, 0))       
 
 
 slide_discrete <-
@@ -329,10 +375,10 @@ slide_discrete <-
 slide_discrete
 ####################################
 # Row-1 label plot already in p_fix1
-row_fixed <- p_fix1 + p_fix2 + p_fix3 + p_bernoulli      # 4 plots
+row_fixed <- p_fix1 + p_fix2 + p_fix3 + p_fix4      # 4 plots
 
 # Row-2 label plot already in p_cnt1
-row_count <- p_cnt1 + p_cnt2 + p_cnt3 + p_zipf           # 4 plots
+row_count <- p_cnt1 + p_cnt2 + p_cnt3 + p_cnt4           # 4 plots
 
 slide_discrete <- (
   row_fixed /
