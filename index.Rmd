@@ -23,12 +23,15 @@ output:
 class: inverse, center, large
 
 
-<h1 style="font-size: 80px; margin-top: 200px;">Beware the Average</h1>
+<h1 style="font-size: 80px; margin-top: 150px;">Beware the Metrics</h1>
 
 <hr style="margin-top: 2em; margin-bottom: 2em;">
 
 --
-<h2 style="font-size: 60px;">It's Meaner than the Median</h2>
+<h2 style="font-size: 50px;">Misuse and Misunderstanding, Not Math, Mislead</h2>
+
+--
+<h2 style="font-size: 40px;">mean ≠ median</h2>
 
 ---
 
@@ -45,7 +48,7 @@ library(dplyr)
 library(patchwork)
 
 set.seed(123)
-wealth_before <- rlnorm(50, meanlog = 11, sdlog = 0.4)
+wealth_before <- rlnorm(50, meanlog = 11, sdlog = 0.1)
 
 mean_b <- mean(wealth_before)
 med_b  <- median(wealth_before)
@@ -477,12 +480,26 @@ class: inverse, center, large
 ![](assets/dist_discrete.png)
 
 ---
+class: inverse, center, large
 
-## 3. Correlation, Causation, Confounding
 
-### Types and Skew
+<h1 style="font-size: 80px; margin-top: 150px;">Correlation, Confounding, Causation</h1>
+
+<hr style="margin-top: 2em; margin-bottom: 2em;">
+
+--
+<h2 style="font-size: 80px;">and the Stories We Tell</h2>
+
+
 
 ---
+
+![](assets/anscombe_data.png)
+
+---
+
+![](assets/anscombe_data_corr.png)
+
 
 ## 3. Linear and Non-Linear Effects
 

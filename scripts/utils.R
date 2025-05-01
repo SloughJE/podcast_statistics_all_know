@@ -391,3 +391,83 @@ ggsave(
   "/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/dist_discrete.png",slide_discrete ,
   width = 12, height = 10, dpi = 1200
 ) 
+
+
+################
+# anscombe
+library(tidyverse)
+
+# Define the data
+anscombe <- tibble::tibble(
+  x1 = c(10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5),
+  y1 = c(8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68),
+  x2 = c(10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5),
+  y2 = c(9.14, 8.14, 8.74, 8.77, 9.26, 8.10, 6.13, 3.10, 9.13, 7.26, 4.74),
+  x3 = c(10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5),
+  y3 = c(7.46, 6.77, 12.74, 7.11, 7.81, 8.84, 6.08, 5.39, 8.15, 6.42, 5.73),
+  x4 = c(8, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8),
+  y4 = c(6.58, 5.76, 7.71, 8.84, 8.47, 7.04, 5.25, 12.50, 5.56, 7.91, 6.89)
+)
+
+
+
+make_anscombe_plot <- function(data, set_label, xlim = c(4, 19), ylim = c(3, 13), show_line = TRUE) {
+  
+  p <- ggplot(data, aes(x, y)) +
+    geom_point(size = 4, color = "#3C4756", fill = "#5A6B80", shape = 21, stroke = 1.2) +
+    coord_cartesian(xlim = xlim, ylim = ylim, expand = TRUE) +
+    theme_classic(base_size = 16) +
+    labs(x = "x", y = "y", title = paste0("Anscombe ", set_label)) +
+    theme(
+      axis.line.x = element_line(color = "black"),
+      axis.line.y = element_line(color = "black"),
+      axis.ticks.x = element_line(color = "black"),
+      axis.ticks.y = element_line(color = "black"),
+      axis.text.x = element_text(color = "black"),
+      axis.text.y = element_text(color = "black"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5)
+    )
+  
+  if (show_line) {
+    model <- lm(y ~ x, data = data)
+    intercept <- coef(model)[1]
+    slope <- coef(model)[2]
+    corr <- cor(data$x, data$y)
+    eq <- paste0("y = ", round(intercept, 2), " + ", round(slope, 2), "x")
+    
+    p <- p +
+      geom_abline(intercept = intercept, slope = slope, color = "#C04E3D", linewidth = 1.5) +
+      annotate("text", x = 4, y = 12, hjust = 0, family = "mono",
+               label = paste0("Corr: ", round(corr, 2), "\n", eq),
+               size = 6)
+  }
+  
+  return(p)
+}
+
+p1 <- make_anscombe_plot(tibble(x = anscombe$x1, y = anscombe$y1), "Set 1", show_line = FALSE)
+p2 <- make_anscombe_plot(tibble(x = anscombe$x2, y = anscombe$y2), "Set 2", show_line = FALSE)
+p3 <- make_anscombe_plot(tibble(x = anscombe$x3, y = anscombe$y3), "Set 3", show_line = FALSE)
+p4 <- make_anscombe_plot(tibble(x = anscombe$x4, y = anscombe$y4), "Set 4", show_line = FALSE)
+
+final_plot <- (p1 + p2) / (p3 + p4)
+final_plot
+
+ggsave(
+  "/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/anscombe_data.png",final_plot ,
+  width = 12, height = 10, dpi = 1200
+) 
+
+
+p1 <- make_anscombe_plot(tibble(x = anscombe$x1, y = anscombe$y1), "Set 1")
+p2 <- make_anscombe_plot(tibble(x = anscombe$x2, y = anscombe$y2), "Set 2")
+p3 <- make_anscombe_plot(tibble(x = anscombe$x3, y = anscombe$y3), "Set 3")
+p4 <- make_anscombe_plot(tibble(x = anscombe$x4, y = anscombe$y4), "Set 4")
+
+final_plot <- (p1 + p2) / (p3 + p4)
+final_plot
+
+ggsave(
+  "/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/anscombe_data_corr.png",final_plot ,
+  width = 12, height = 10, dpi = 1200
+) 
