@@ -480,6 +480,39 @@ class: inverse, center, large
 ![](assets/dist_discrete.png)
 
 ---
+
+## 2. Distributions
+
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} \, e^{ -\frac{1}{2} \left( \frac{x - \mu}{\sigma} \right)^2 }
+$$
+Where:
+- $\mu$ = the **mean** (center)
+- $\sigma$ = the **standard deviation** (spread)
+- $x$ = the value at which we evaluate the density
+- $f(x)$ = the probability density at $x$ given $\mu$ and $\sigma$
+
+
+---
+.center[
+**Normal distribution**
+]
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} \, e^{ -\frac{1}{2} \left( \frac{x - \mu}{\sigma} \right)^2 }
+$$
+<hr style="border: 0; height: 1px; background: lightgray;">
+
+<div style="text-align: center;">
+  <img src="assets/normal_annotated.png">
+</div>
+
+
+
+
+---
+
+
 class: inverse, center, large
 
 

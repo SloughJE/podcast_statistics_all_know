@@ -329,7 +329,66 @@ ggsave(
   width = 12, height = 10, dpi = 1200
 ) 
 #####################
+# annotate normal dist:
 
+mu     <- 0
+sigma  <- 2.5
+x_rng  <- c(mu - 4*sigma, mu + 4*sigma)
+
+# base curve, peak scaled to 1
+p_base <- make_dist_plot(rnorm,
+                         mean   = mu,
+                         sd     = sigma,
+                         adjust = 10,
+                         title  = NULL) +
+  coord_cartesian(xlim = x_rng, ylim = c(0, 1.05), expand = FALSE)
+
+p <- p_base +
+  
+  ## centre line  (μ)
+  geom_vline(xintercept = mu,
+             colour = "#C04E3D", linetype = "dashed") +
+  annotate("text", x = mu, y = 0.8, label = "mean~(mu)",
+           parse = TRUE, hjust = .5, vjust = 0, size = 4) +
+  
+  ## peak = 1/(σ√2π)
+  annotate("text",
+           x     = mu,
+           y     = 1.025,
+           label = "peak==1/(sigma*sqrt(2*pi))",
+           parse = TRUE, hjust = .5, size = 4) +
+  
+  ## one-sigma “ruler”  (horizontal arrow)
+  annotate("segment",
+           x     = mu - sigma, xend = mu + sigma,
+           y     = 0.12,       yend = 0.12,
+           colour = "#BFA06D", linewidth = 1,
+           arrow  = arrow(ends = "both", type = "closed",
+                          length = unit(0.18, "in"))) +
+  
+  # centred σ label just above the arrow
+  annotate("text",
+           x = mu, y = 0.15,
+           label = "\u03C3",      # or just "'\\u03C3'" for the symbol
+           size = 6) +
+  
+  ## decay label near the right shoulder
+  annotate("text",
+           x     = mu + 1.62*sigma,
+           y     = 0.52,
+           label = "e^{-frac(1,2)*((x - mu)/sigma)^2}",
+           parse = TRUE, hjust = 0, size = 4) +
+  annotate("text",
+           x     = mu + 1.47*sigma,
+           y     = 0.58,
+           label = "exponential~decay",
+           parse = TRUE, hjust = 0, size = 4)
+
+p  
+ggsave(
+  "/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/normal_annotated.png",p  ,
+  width = 6, height = 4, dpi = 1200, bg="white"
+) 
 
 
 ################
