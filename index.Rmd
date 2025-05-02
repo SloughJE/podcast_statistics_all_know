@@ -975,37 +975,35 @@ Publication bias: Studies with "positive" results are more likely to be publishe
 
 ## 5. Bias
 
-### The Self-Reinforcing Feedback Loop of Bias
+The Self-Reinforcing Feedback Loop of Bias
 
-
-```{r bias-feedback-loop1, echo=FALSE, message=FALSE, warning=FALSE}
+```{r bias_feedback_loop1, echo = FALSE, message = FALSE, warning = FALSE}
 library(DiagrammeR)
 library(htmltools)
 
-graph <- grViz("
-digraph bias_loop {
+div(
+  style = "display:flex; justify-content:center;",
+  grViz("
+    digraph bias_loop {
+      graph [layout = circo]
+      node  [shape = box, style = \"rounded,filled\", fontname = Helvetica, fontsize = 12]
 
-  graph [layout = circo]
-  node [shape = box, style = \"rounded,filled\", fontname = Helvetica, fontsize=12]
+      CurrentBias       [label = 'Current Bias',       fillcolor = '#F5C4BB']
+      SelectiveAttention[label = 'Selective Attention',fillcolor = '#EDA89C']
+      SelectiveEvidence [label = 'Selective Evidence', fillcolor = '#E17A66']
+      ReinforcedBias    [label = 'Reinforced Bias',    fillcolor = '#C04E3D']
 
-  # Node Colors
-  CurrentBias [label = 'Current Bias', fillcolor = '#F5C4BB']        # lightest red
-  SelectiveAttention [label = 'Selective Attention', fillcolor = '#EDA89C'] # medium-light
-  SelectiveEvidence [label = 'Selective Evidence', fillcolor = '#E17A66']   # medium
-  ReinforcedBias [label = 'Reinforced Bias', fillcolor = '#C04E3D']          # strong bias (your mean_color)
+      edge [penwidth = 2]
 
-  edge [penwidth = 2]
-
-  CurrentBias -> SelectiveAttention
-  SelectiveAttention -> SelectiveEvidence
-  SelectiveEvidence -> ReinforcedBias
-  ReinforcedBias -> CurrentBias
-}
-")
-
-graph
-
-
+      CurrentBias       -> SelectiveAttention
+      SelectiveAttention-> SelectiveEvidence
+      SelectiveEvidence -> ReinforcedBias
+      ReinforcedBias    -> CurrentBias
+    }
+  ",
+  width  = 525,  
+  height = 525)
+)
 
 ```
 
