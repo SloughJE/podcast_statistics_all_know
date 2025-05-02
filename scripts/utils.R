@@ -346,8 +346,8 @@ p_base <- make_dist_plot(rnorm,
 p <- p_base +
   
   ## centre line  (μ)
-  geom_vline(xintercept = mu,
-             colour = "#C04E3D", linetype = "dashed") +
+  geom_segment(aes(x = mu, xend = mu, y = 0, yend = 1),
+               colour = "#C04E3D", linetype = "dashed") +
   annotate("text", x = mu, y = 0.8, label = "mean~(mu)",
            parse = TRUE, hjust = .5, vjust = 0, size = 4) +
   
@@ -530,3 +530,67 @@ ggsave(
   "/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/anscombe_data_corr.png",final_plot ,
   width = 12, height = 10, dpi = 1200
 ) 
+
+
+df <- read.csv("/Users/johnslough/Desktop/code/podcast_presentations/everyone_should_know_statistics/assets/heart_disease_fat_oil_approx.csv")
+
+
+# View the first few rows
+head(df)
+df[df == "NA"] <- NA
+df <- data.frame(lapply(df, function(x) as.numeric(as.character(x))))
+
+# Access columns as vectors
+years <- df$year
+sat_fat <- df$sat_fat_g_per_capita
+veg_oil <- df$veg_oil_g_per_capita
+heart_disease <- df$heart_disease_deaths_000s
+total_calories = df$total_calories
+
+cor_satfat <- round(cor(heart_disease, sat_fat, use = "complete.obs"), 2)
+cor_vegoil <- round(cor(heart_disease, veg_oil, use = "complete.obs"), 2)
+cor_total_cal <- round(cor(heart_disease, total_calories, use = "complete.obs"), 2)
+
+# Plot
+plot_ly() %>%
+  add_lines(x = years, y = sat_fat, name = "Saturated Fat (g/day)", yaxis = "y", line = list(color = "purple", width = 5)) %>%
+  add_lines(x = years, y = veg_oil, name = "Vegetable Oil (g/day)", yaxis = "y", line = list(color = "black", width = 5)) %>%
+  add_lines(x = years, y = heart_disease, name = "Heart Disease Deaths (thousands)", yaxis = "y2", line = list(color = "red", width = 5)) %>%
+  layout(
+    title = list(text = "<b>Heart Disease Deaths, Saturated Fat and Vegetable Oil</b>", y = 0.95, font = list(size=22)),
+    xaxis = list(title = "", showgrid = TRUE, zeroline = FALSE,showline = FALSE, linecolor = "black"),
+    margin = list(r = 60, t=60, l=40),
+    yaxis = list(
+      title = "Grams Per Capita Per Day",
+      showgrid = TRUE,
+      gridcolor = "lightgray",
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showline = FALSE,
+      linecolor = "black",
+      titlefont = list(size = 14)
+    ),
+    yaxis2 = list(
+      title = "Heart Disease Deaths (Thousands)",
+      overlaying = "y",
+      side = "right",
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showline = FALSE, 
+      titlefont = list(size = 14, color = "red"),
+      tickfont = list(color = "red"),
+      title_standoff = 100
+    ),annotations = list(
+      list(
+        x = 0.01, y = .92, xref = "paper", yref = "paper",
+        text = paste0("Corr (Heart Disease, Saturated Fat): ", cor_satfat),
+        showarrow = FALSE, font = list(size = 16, color = "purple")
+      ),
+      list(
+        x = 0.01, y = .87, xref = "paper", yref = "paper",
+        text = paste0("Corr (Heart Disease, Vegetable Oil): ", cor_vegoil),
+        showarrow = FALSE, font = list(size = 16, color = "black")
+      )
+    ),
+    legend = list(orientation = "h", x = 0.1, y = -0.05)
+  )

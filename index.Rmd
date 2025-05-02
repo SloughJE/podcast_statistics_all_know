@@ -509,6 +509,14 @@ $$
 
 
 
+---
+## 2. Distributions
+
+- Outcomes fall across possibilities
+
+- Those possibilities form a distribution
+
+- Identifying the distribution can shape your analysis
 
 ---
 
@@ -534,11 +542,90 @@ class: inverse, center, large
 ![](assets/anscombe_data_corr.png)
 
 
-## 3. Linear and Non-Linear Effects
+---
+
+```{r veg_oil, echo=FALSE, message=FALSE, warning=FALSE}
+
+df <- read.csv("assets/heart_disease_fat_oil_approx.csv")
+
+
+# View the first few rows
+
+df[df == "NA"] <- NA
+df <- data.frame(lapply(df, function(x) as.numeric(as.character(x))))
+
+# Access columns as vectors
+years <- df$year
+sat_fat <- df$sat_fat_g_per_capita
+veg_oil <- df$veg_oil_g_per_capita
+heart_disease <- df$heart_disease_deaths_000s
+total_calories = df$total_calories
+
+cor_satfat <- round(cor(heart_disease, sat_fat, use = "complete.obs"), 2)
+cor_vegoil <- round(cor(heart_disease, veg_oil, use = "complete.obs"), 2)
+cor_total_cal <- round(cor(heart_disease, total_calories, use = "complete.obs"), 2)
+
+# Plot
+plot_ly(width = 800, height = 550) %>%
+  add_lines(x = years, y = sat_fat, name = "Saturated Fat (g/day)", yaxis = "y", line = list(color = "purple", width = 5)) %>%
+  add_lines(x = years, y = veg_oil, name = "Vegetable Oil (g/day)", yaxis = "y", line = list(color = "black", width = 5)) %>%
+  add_lines(x = years, y = heart_disease, name = "Heart Disease Deaths (thousands)", yaxis = "y2", line = list(color = "red", width = 5)) %>%
+  layout(
+    title = list(text = "<b>Heart Disease Deaths, Saturated Fat, Vegetable Oil</b>", y = 0.95, font = list(size=22)),
+    xaxis = list(title = "", showgrid = TRUE, zeroline = FALSE,showline = FALSE, linecolor = "black"),
+    margin = list(r = 80, t=60, l=40),
+    yaxis = list(
+      title = "Grams Per Capita Per Day",
+      showgrid = TRUE,
+      gridcolor = "lightgray",
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showline = FALSE,
+      linecolor = "black",
+      titlefont = list(size = 14)
+    ),
+    yaxis2 = list(
+      title = "Heart Disease Deaths (Thousands)",
+      overlaying = "y",
+      side = "right",
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showline = FALSE, 
+      titlefont = list(size = 14, color = "red"),
+      tickfont = list(color = "red"),
+      title_standoff = 100
+    ),annotations = list(
+      list(
+        x = 0.01, y = .92, xref = "paper", yref = "paper",
+        text = paste0("Corr (Heart Disease, Saturated Fat): ", cor_satfat),
+        showarrow = FALSE, font = list(size = 14, color = "purple")
+      ),
+      list(
+        x = 0.01, y = .87, xref = "paper", yref = "paper",
+        text = paste0("Corr (Heart Disease, Vegetable Oil): ", cor_vegoil),
+        showarrow = FALSE, font = list(size = 14, color = "black")
+      )
+    ),
+    legend = list(orientation = "h", x = 0.1, y = -0.05)
+  )
+
+```
+
+<small style="font-size:12px; line-height:1; display:inline-block;">
+"Figure 2 correlates saturated fat and total vegetable oil consumption versus heart disease deaths in the U.S.A., with data on all three dating back to at least 1909."</small>
+<small style="font-size:12px; line-height:1; display:inline-block;">
+Data: <a href="https://www.fns.usda.gov/cnpp/us-foodsupply/nutrient-content-1909-2010">USDA Food Supply</a> |
+Paper: <a href="https://www.sciencedirect.com/science/article/abs/pii/S0306987717305017?via%3Dihub">ScienceDirect</a> |
+Video: <a href="https://www.youtube.com/watch?v=7kGnfXXIKZM">YouTube</a>
+</small>
 
 ---
 
-## 4. Bias
+## 4. Linear and Non-Linear Effects
+
+---
+
+## 5. Bias
 
 **Bias** is the difference between the expected value of an estimator and the true value of the parameter it estimates.
 
@@ -580,7 +667,7 @@ Publication bias: Studies with "positive" results are more likely to be publishe
 
 ---
 
-## 4. Bias
+## 5. Bias
 
 ### The Self-Reinforcing Feedback Loop of Bias
 
@@ -628,14 +715,12 @@ library(dplyr)
 library(tibble)
 library(plotly)
 
-## parameters -----------------------------------------------------------
 time          <- 0:50
 r             <- 0.07
 truth_vals    <- rep(0, length(time))
 estimate_vals <- (1 + r)^time
 
 
-## cumulative data for the two animated lines ---------------------------
 cum_df <- bind_rows(lapply(time, function(t) {
   tibble(
     time_point = rep(0:t, 2),
@@ -646,7 +731,6 @@ cum_df <- bind_rows(lapply(time, function(t) {
   )
 }))
 
-## static dots only at t = 0 -------------------------------------------
 dot_df <- tibble(
   time_point = c(0, 0),
   value      = c(truth_vals[1], estimate_vals[1]),
@@ -654,7 +738,6 @@ dot_df <- tibble(
   frame      = 0
 )
 
-## plot -----------------------------------------------------------------
 plot_ly(width = 700, height = 500) %>%
   # show only the two starting dots at frame 0
   add_markers(
@@ -716,7 +799,6 @@ truth_vals    <- rep(0, length(time))
 estimate_vals <- (1 + r)^time
 
 
-## cumulative data for the two animated lines ---------------------------
 cum_df <- bind_rows(lapply(time, function(t) {
   tibble(
     time_point = rep(0:t, 2),
@@ -727,7 +809,6 @@ cum_df <- bind_rows(lapply(time, function(t) {
   )
 }))
 
-## static dots only at t = 0 -------------------------------------------
 dot_df <- tibble(
   time_point = c(0, 0),
   value      = c(truth_vals[1], estimate_vals[1]),
@@ -856,7 +937,6 @@ Vegan Edition
 
 ```{r bias-feedback-vegan2, echo=FALSE, message=FALSE, warning=FALSE}
 
-## static plot ----------------------------------------------------------
 plot_ly(width = 750, height = 500) %>%
   # plot the two starting dots
   add_markers(
