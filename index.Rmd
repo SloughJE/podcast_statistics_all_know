@@ -534,6 +534,11 @@ class: inverse, center, large
 
 
 ---
+class: inverse, center, large, middle
+
+<h1 style="font-size: 80px; ">Correlation</h1>
+
+---
 
 ![](assets/anscombe_data.png)
 
@@ -541,9 +546,217 @@ class: inverse, center, large
 
 ![](assets/anscombe_data_corr.png)
 
+---
+class: inverse, center, large, middle
+
+<h1 style="font-size: 80px; ">Confounding</h1>
 
 ---
 
+
+```{r shoes, fig.width=4, fig.height=3, echo=FALSE, message=FALSE, warning=FALSE}
+
+format_p <- function(p) {
+  if (p < 0.001) {
+    "< 0.001"
+  } else {
+    round(p, 3)
+  }
+}
+
+
+set.seed(123)
+n      <- 500
+age    <- sample(1:18, n, replace = TRUE)            
+shoe   <- rnorm(n, mean = 1.5 * age + 10, sd = 2)   
+shoe   <- round(shoe * 2) / 2   # Round to nearest half-size
+
+reading<- rnorm(n, mean = 5 * age + 20, sd = 20)     
+df <- tibble(age, shoe, reading)
+
+model_shoe <- lm(reading ~ shoe, data = df)
+
+model_age <- lm(reading ~ age, data = df)
+
+model_both <- lm(reading ~ shoe + age, data = df)
+
+```
+
+.pull-left[
+
+```{r, shoes_reading, fig.width=5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+p_reading = ggplot(df, aes(shoe, reading)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "Shoe Size vs Reading Score") +
+  theme_minimal()
+
+ggplotly(p_reading) %>%
+  config(displayModeBar = FALSE)
+
+```
+
+- Model: `reading ~ shoe size`
+- Model p-value (shoe): `r broom::tidy(model_shoe) %>% filter(term == "shoe") %>% pull(p.value) %>% format_p()`
+
+]
+
+
+---
+
+.pull-left[
+
+```{r, shoes_reading2, fig.width=5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+p_reading = ggplot(df, aes(shoe, reading)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "Shoe Size vs Reading Score") +
+  theme_minimal()
+
+ggplotly(p_reading) %>%
+  config(displayModeBar = FALSE)
+
+```
+
+- Model: `reading ~ shoe size`
+- Model p-value (shoe): `r broom::tidy(model_shoe) %>% filter(term == "shoe") %>% pull(p.value) %>% format_p()`
+]
+
+.pull-right[
+
+```{r, age_reading, fig.width=5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+p_age = ggplot(df, aes(age, reading)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Age vs Reading Score") +
+  theme_minimal()
+
+ggplotly(p_age) %>%
+  config(displayModeBar = FALSE)
+
+```
+
+- Model: `reading ~ age`
+- Model p-value (age): `r broom::tidy(model_age) %>% filter(term == "age") %>% pull(p.value) %>% format_p()`
+]
+
+---
+
+
+.pull-left[
+
+```{r, shoes_reading3, fig.width=5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+p_reading = ggplot(df, aes(shoe, reading)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "Shoe Size vs Reading Score") +
+  theme_minimal()
+
+ggplotly(p_reading) %>%
+  config(displayModeBar = FALSE)
+
+```
+
+- Model: `reading ~ shoe size`
+- Model p-value (shoe): `r broom::tidy(model_shoe) %>% filter(term == "shoe") %>% pull(p.value) %>% format_p()`
+
+]
+
+.pull-right[
+
+```{r, age_reading2, fig.width=5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+p_age = ggplot(df, aes(age, reading)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Age vs Reading Score") +
+  theme_minimal()
+
+ggplotly(p_age) %>%
+  config(displayModeBar = FALSE)
+
+```
+
+- Model: `reading ~ age`
+- Model p-value (age): `r broom::tidy(model_age) %>% filter(term == "age") %>% pull(p.value) %>% format_p()`
+]
+<hr style="border: 0; height: 1px; background: lightgray;">
+.center[
+Combined Model: `reading ~ shoe + age`
+
+```{r, output_model, echo=FALSE, message=FALSE, warning=FALSE}
+shoe_p <- broom::tidy(model_both) %>% filter(term == "shoe") %>% pull(p.value) %>% format_p()
+age_p  <- broom::tidy(model_both) %>% filter(term == "age") %>% pull(p.value) %>% format_p()
+```
+
+Shoe p-value: `r shoe_p`; Age p-value: **`r age_p`**
+
+> **Result:** Once age is included, shoe size is no longer significant
+]
+
+
+---
+class: inverse, center, large, middle
+
+<h1 style="font-size: 80px; ">Causality</h1>
+
+
+---
+
+.pull-left[
+### Core Principles
+
+- **Control:** Hold all other variables constant
+- **Manipulation:** Apply a treatment or intervention
+- **Randomization:** Assign subjects to treatment/control by chance
+- **Comparison:** Measure differences in outcomes between groups
+
+> **Key Idea:**  
+> Experimental design isolates the **effect** of a specific factor  
+> by eliminating alternative explanations.
+]
+
+.pull-right[
+```{r, causality, fig.width=4.5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Compare outcomes between randomized groups to estimate causal effect"}
+library(ggplot2)
+library(dplyr)
+
+# Conceptual RCT-like schematic
+df_exp <- tibble(
+  group = rep(c("Control", "Treatment"), each = 5),
+  outcome = c(5, 6, 5, 6, 5,   # control outcomes
+              8, 9, 7, 9, 8),  # treatment outcomes
+  id = 1:10
+)
+
+p_cause = ggplot(df_exp, aes(x = group, y = outcome)) +
+  geom_jitter(width = 0.1, height = 0, size = 3, alpha = 0.7) +
+  stat_summary(fun = mean, geom = "crossbar", width = 0.5, color = "red", fatten = 2) +
+  labs(
+    title = "Simplified Experimental Setup",
+    y = "Outcome",
+    x = ""
+  ) +
+  theme_minimal(base_size = 12)
+
+ggplotly(p_cause) %>%
+  config(displayModeBar = FALSE)
+
+```
+]
+
+
+
+.center[
+> Experiments test causality by manipulating one factor,  
+> holding everything else constant, and comparing outcomes.
+]
+
+---
+class: inverse, center, large, middle
+
+<h1 style="font-size: 80px; ">The Stories We Tell</h1>
+
+---
 ```{r veg_oil, echo=FALSE, message=FALSE, warning=FALSE}
 
 df <- read.csv("assets/heart_disease_fat_oil_approx.csv")
@@ -611,7 +824,7 @@ plot_ly(width = 800, height = 550) %>%
 
 ```
 
-<small style="font-size:12px; line-height:1; display:inline-block;">
+<small style="font-size:12px; line-height:1.1; display:inline-block;">
 "Figure 2 correlates saturated fat and total vegetable oil consumption versus heart disease deaths in the U.S.A., with data on all three dating back to at least 1909."</small>
 <small style="font-size:12px; line-height:1; display:inline-block;">
 Data: <a href="https://www.fns.usda.gov/cnpp/us-foodsupply/nutrient-content-1909-2010">USDA Food Supply</a> |
