@@ -697,64 +697,157 @@ Shoe p-value: `r shoe_p`; Age p-value: **`r age_p`**
 ---
 class: inverse, center, large, middle
 
-<h1 style="font-size: 80px; ">Causality</h1>
+<h1 style="font-size: 80px; ">Causation</h1>
 
 
 ---
+### How do we test if A causes B?
+<hr style="border: 0; height: 1px; background: lightgray;">
+
+--
 
 .pull-left[
-### Core Principles
+<div style="margin-top: 4px;">
 
-- **Control:** Hold all other variables constant
-- **Manipulation:** Apply a treatment or intervention
-- **Randomization:** Assign subjects to treatment/control by chance
-- **Comparison:** Measure differences in outcomes between groups
+<b>Randomized Controlled Trial</b>
 
-> **Key Idea:**  
-> Experimental design isolates the **effect** of a specific factor  
-> by eliminating alternative explanations.
+<ul style="font-size: 80%;">
+<li><b>Randomization:</b> Assign by chance to treatment or control</li>
+<br>
+<li><b>Control:</b> Keep other factors balanced across groups (via randomization)</li>
+<br>
+<li><b>Treatment:</b> Apply the intervention</li>
+<br>
+<li><b>Comparison:</b> Check for outcome differences between groups</li>
+</ul>
+
+</div>
 ]
 
 .pull-right[
-```{r, causality, fig.width=4.5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Compare outcomes between randomized groups to estimate causal effect"}
+
+
+
+```{r, causality, fig.width=4.5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+
+#fig.cap="Compare outcomes between randomized groups to estimate causal effect"
 library(ggplot2)
 library(dplyr)
 
-# Conceptual RCT-like schematic
 df_exp <- tibble(
-  group = rep(c("Control", "Treatment"), each = 5),
-  outcome = c(5, 6, 5, 6, 5,   # control outcomes
-              8, 9, 7, 9, 8),  # treatment outcomes
-  id = 1:10
+  group = rep(c("Control", "Treatment"), each = 20),
+  outcome = c(rnorm(20, mean = 5.5, sd = 0.5),   # control outcomes
+              rnorm(20, mean = 8.0, sd = 0.5))   # treatment outcomes
 )
 
-p_cause = ggplot(df_exp, aes(x = group, y = outcome)) +
-  geom_jitter(width = 0.1, height = 0, size = 3, alpha = 0.7) +
-  stat_summary(fun = mean, geom = "crossbar", width = 0.5, color = "red", fatten = 2) +
+# Create plot with group-based color
+p_cause <- ggplot(df_exp, aes(x = group, y = outcome, color = group)) +
+  geom_jitter(width = 0.04, height = 0, size = 1, alpha = 0.4) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 1) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.25, linewidth = 1) +
   labs(
-    title = "Simplified Experimental Setup",
+    title = "Simplified Experimental Outcome",
     y = "Outcome",
     x = ""
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 10) +
+  scale_color_manual(values = c("Control" = "#BFA06D", "Treatment" = mean_color)) +
+  theme(legend.position = "none")
 
+# Convert to plotly (if interactive)
 ggplotly(p_cause) %>%
   config(displayModeBar = FALSE)
 
 ```
+
 ]
 
+<br>
 
 
-.center[
-> Experiments test causality by manipulating one factor,  
-> holding everything else constant, and comparing outcomes.
-]
+> Experiments test causality by manipulating one factor, 
+> using randomization to balance everything else,
+> and comparing outcomes.
+
 
 ---
 class: inverse, center, large, middle
 
 <h1 style="font-size: 80px; ">The Stories We Tell</h1>
+
+---
+```{r tell_a_story, echo=FALSE, message=FALSE, warning=FALSE}
+
+df <- read.csv("assets/heart_disease_fat_oil_approx.csv")
+
+
+# View the first few rows
+
+df[df == "NA"] <- NA
+df <- data.frame(lapply(df, function(x) as.numeric(as.character(x))))
+
+# Access columns as vectors
+years <- df$year
+sat_fat <- df$sat_fat_g_per_capita
+veg_oil <- df$veg_oil_g_per_capita
+heart_disease <- df$heart_disease_deaths_000s
+total_calories = df$total_calories
+
+cor_satfat <- round(cor(heart_disease, sat_fat, use = "complete.obs"), 2)
+cor_vegoil <- round(cor(heart_disease, veg_oil, use = "complete.obs"), 2)
+cor_veg_sat <- round(cor(sat_fat, veg_oil, use = "complete.obs"), 2)
+cor_total_cal <- round(cor(heart_disease, total_calories, use = "complete.obs"), 2)
+
+# Plot
+plot_ly(width = 800, height = 550) %>%
+  add_lines(x = years, y = sat_fat, name = "Variable A", yaxis = "y", line = list(color = "purple", width = 5)) %>%
+  add_lines(x = years, y = veg_oil, name = "Variable B", yaxis = "y", line = list(color = "black", width = 5)) %>%
+  add_lines(x = years, y = heart_disease, name = "Variable C", yaxis = "y2", line = list(color = "red", width = 5)) %>%
+  layout(
+    title = list(text = "<b>Variable A, Variable B, Variable C</b>", y = 0.95, font = list(size=22)),
+    xaxis = list(title = "", showgrid = TRUE, zeroline = FALSE,showline = FALSE, linecolor = "black"),
+    margin = list(r = 80, t=60, l=40),
+    yaxis = list(
+      title = "Variable A & B Units",
+      showgrid = TRUE,
+      gridcolor = "lightgray",
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showline = FALSE,
+      linecolor = "black",
+      titlefont = list(size = 14)
+    ),
+    yaxis2 = list(
+      title = "Variable C Units",
+      overlaying = "y",
+      side = "right",
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showline = FALSE, 
+      titlefont = list(size = 14, color = "red"),
+      tickfont = list(color = "red"),
+      title_standoff = 100
+    ),annotations = list(
+      list(
+        x = 0.01, y = .92, xref = "paper", yref = "paper",
+        text = paste0("Corr (Variable A, Variable B): ", cor_veg_sat),
+        showarrow = FALSE, font = list(size = 14, color = "black")
+      ),
+      list(
+        x = 0.01, y = .87, xref = "paper", yref = "paper",
+        text = paste0("Corr (Variable A, Variable C): ", cor_satfat),
+        showarrow = FALSE, font = list(size = 14, color = "black")
+      ),
+      list(
+        x = 0.01, y = .82, xref = "paper", yref = "paper",
+        text = paste0("Corr (Variable B, Variable C): ", cor_vegoil),
+        showarrow = FALSE, font = list(size = 14, color = "black")
+      )
+    ),
+    legend = list(orientation = "h", x = 0.1, y = -0.05)
+  )
+
+```
 
 ---
 ```{r veg_oil, echo=FALSE, message=FALSE, warning=FALSE}
