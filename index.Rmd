@@ -927,7 +927,94 @@ Video: <a href="https://www.youtube.com/watch?v=7kGnfXXIKZM">YouTube</a>
 
 ---
 
-## 4. Linear and Non-Linear Effects
+class: inverse, center, large
+
+
+<h1 style="font-size: 80px; margin-top: 200px;">Shapes of Change</h1>
+
+<hr style="margin-top: 2em; margin-bottom: 2em;">
+
+--
+<h2 style="font-size: 60px;">What Curve, What Point?</h2>
+
+---
+## 4. Shapes of Change
+
+
+```{r linear_non, echo = FALSE, message = FALSE, warning = FALSE}
+library(dplyr)
+library(tidyr)
+library(stringr)
+
+curve_data <- data.frame(x = seq(0, 5, 0.1)) %>%
+  mutate(
+    linear = 4 * x,
+    exponential = 2^x - 1,               # shift so at x=0, y=0
+    quadratic = x^2,
+    logarithmic = (log(x) - log(0.1)) * 3.5
+  )
+
+long_data <- curve_data %>%
+  pivot_longer(-x, names_to = "type", values_to = "y")
+
+# Define shorthand mapping
+shorthand <- c(
+  linear = "Steady progress (each step adds the same)",
+  exponential = "Snowball effect (growth feeds more growth)",
+  quadratic = "Accelerating effort (small changes early, big jumps later)",
+  logarithmic = "Diminishing returns (fast early gains, then tapering off)"
+)
+
+p <- ggplot(long_data, aes(x = x, y = y, color = type, linetype = type, group = type, 
+                           text = paste0(str_to_title(type),"\n", shorthand[type]))) +
+  geom_line(size = 1.5) +
+  scale_color_manual(
+    values = c(
+      linear = "grey50",
+      exponential = "steelblue",
+      quadratic = "darkgreen",
+      logarithmic = "darkred"
+    ),
+    labels = c(
+      linear = "Linear",
+      exponential = "Exponential",
+      quadratic = "Quadratic",
+      logarithmic = "Logarithmic"
+    )
+  ) +
+  scale_linetype_manual(
+    values = c(
+      linear = "dashed",
+      exponential = "solid",
+      quadratic = "dashed",
+      logarithmic = "solid"
+    ),
+    labels = c(
+      linear = "Linear",
+      exponential = "Exponential",
+      quadratic = "Quadratic",
+      logarithmic = "Logarithmic"
+    )
+  ) +
+  theme_void(base_size = 14) +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+
+ggplotly(p, tooltip = "text", height = 500, width = 750) %>% layout(
+  xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
+  yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
+  legend = list(
+    title = list(text = ""),
+    orientation = "h",
+    x = 0.5, xanchor = "center",
+    y = 0, yanchor = "top"
+  )
+)
+
+
+
+```
+
 
 ---
 
