@@ -1277,47 +1277,114 @@ class: inverse, center, large
 
 ## 5. Bias
 
-**Bias** is the difference between the expected value of an estimator and the true value of the parameter it estimates.
+<span style="font-size: 20px;">**Bias** is the systematic difference between the expected result of an estimator and the true underlying value it's trying to measure.</span>
+<br>
 
-Formally:
+--
 
-$$
-\text{Bias}(\hat{\theta}) = \mathbb{E}[\hat{\theta}] - \theta
-$$
+<span style="font-size: 20px;">It's the **consistent gap** between what your method tends to estimate and the actual truth — not just random error, but a built-in shift.</span>
+<br>
 
-Where:
-- $\hat{\theta}$ = the **estimator** (your calculated estimate)
-- $\theta$ = the **true parameter** (the real value you want)
-- $\mathbb{E}[\hat{\theta}]$ = the **expected value** of the estimator (its long-run average over many samples)
+--
+
+<span style="font-size: 20px;">Bias means you’re consistently off target because of how you measure, think, or sample — and you don’t realize it.</span>
+
+--
+
+<div style="display: flex; justify-content: center;">
+```{r bias_concept, echo = FALSE, message = FALSE, warning = FALSE}
+
+set.seed(123)
+n <- 20
+true_value <- 100
+
+# Generate data
+unbiased <- rnorm(n, mean = true_value, sd = 5)
+biased <- rnorm(n, mean = true_value + 10, sd = 5)
+
+df <- data.frame(
+  estimate = c(unbiased, biased),
+  type = rep(c("Unbiased", "Biased"), each = n)
+)
+
+# Calculate group means and confidence intervals
+summary_df <- df %>%
+  group_by(type) %>%
+  summarise(
+    mean = mean(estimate),
+    sd = sd(estimate),
+    se = sd / sqrt(n),
+    lower = mean - 1.96 * se,
+    upper = mean + 1.96 * se
+  )
+
+# Plot
+p_bias = ggplot(summary_df, aes(x = type, y = mean, color = type)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 1) +
+  geom_hline(yintercept = true_value, linetype = "dashed", color = "black") +
+  labs(title = "Conceptual Illustration of Bias",
+       y = "Average Estimate",
+       x = "",
+       caption = "Dashed line = true value (reality)") +
+  scale_color_manual(values = c("steelblue", "tomato")) +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "none")
 
 
-- If Bias = 0 → the estimator is **unbiased**.
+ggplotly(p_bias, height = 300, width = 400) %>%
+  layout(
+    annotations = list(
+      list(
+        text = "Dashed line = true value (reality)",
+        x = 0.05,
+        y = 0.15,
+        xref = "paper",
+        yref = "paper",
+        showarrow = FALSE,
+        font = list(size = 10)
+      )
+    )
+  ) %>%  config(displayModeBar = FALSE)
 
-- If Bias ≠ 0 → the estimator is **biased** (systematically too high or too low).
+
+```
+</div>
 
 ---
+
+## 5. Bias
+
 
 Bias doesn't just shift your first guess.
-It filters what you see next — making you even more biased over time
 
+It filters what you see next, making you even more biased over time
 
-Selection bias: The sample is not representative of the population.
+There are many types of bias including:
 
-Omitted variable bias: Leaving out a variable that influences both the dependent and independent variables.
+--
 
-Measurement bias (or information bias): Errors in how data is collected or recorded.
+<div style="display: flex; justify-content: space-between; font-size: 18px;">
+  <ul style="list-style-type: disc; padding-right: 40px;">
+    <li><b>Selection bias</b>: Non-representative sample</li>
+    <li><b>Omitted variable bias</b>: Missing important predictors</li>
+    <li><b>Measurement bias</b>: Data collection errors</li>
+    <li><b>Survivorship bias</b>: Ignoring those who dropped out</li>
+  </ul>
+  <ul style="list-style-type: disc;">
+    <li><b>Recall bias</b>: Faulty memories skewing data</li>
+    <li><b>Observer bias</b>: Researcher expectations shape results</li>
+    <li><b>Publication bias</b>: Only "positive" results get published</li>
+  </ul>
+</div>
 
-Survivorship bias: Only analyzing "survivors" or those who remain, ignoring those who dropped out or failed.
+--
 
-Recall bias: Errors because people remember things inaccurately (common in surveys and retrospective studies).
-
-Observer bias: Researcher's expectations subtly influence measurements or observations.
-
-Publication bias: Studies with "positive" results are more likely to be published than "null" or "negative" results.
+All these forms share the same principle: they systematically push results away from truth.
 
 ---
 
-## 5. Bias: Expectations and Reality
+## 5. Bias
 
 The Self-Reinforcing Feedback Loop of Bias
 
