@@ -598,11 +598,30 @@ $$
 ---
 ## 2. Distributions
 
-- Outcomes fall across possibilities
+<span style="font-size: 32px;">
+A distribution defines what's typical, what's rare, and what's extreme in a dataset.
+</span>
+<br>
 
-- Those possibilities form a distribution
+--
 
-- Identifying the distribution can shape your analysis
+<span style="font-size: 32px;">
+Identifying the distribution helps you understand:
+</span>
+
+<ul style="font-size: 26px; line-height: 1.4;">
+  <li>what outcomes are likely and unlikely</li>
+  <li>how much variation or uncertainty exists</li>
+  <li>whether rare or extreme events fall within expectations</li>
+  <li>if deviations from expectations signal a need for more investigation</li>
+</ul>
+
+--
+
+<br>
+<span style="font-size: 26px;">
+Distributions describe single variables. What about relationships between variables?
+</span>
 
 ---
 
@@ -1032,6 +1051,31 @@ Paper: <a href="https://www.sciencedirect.com/science/article/abs/pii/S030698771
 Video: <a href="https://www.youtube.com/watch?v=7kGnfXXIKZM">YouTube</a>
 </small>
 
+
+---
+
+## 3. Correlation, Confounding, Causation
+
+<span style="font-size: 28px;">Not all patterns point to cause-and-effect. </span> <br>
+
+--
+
+<span style="font-size: 28px;"> To understand relationships between variables, consider: </span> 
+
+<ul style="font-size: 22px; line-height: 1.4;"> 
+<li>Correlation could mean nothing, or it could mean a lot.</li>
+<li>It could even confuse or obscure real relationships.</li> 
+<li>Causality can be tested (<b>carefully</b>).</li>
+<li>Are we just building stories we want to tell?</li> 
+</ul>
+<br>
+
+--
+
+<span style="font-size: 26px;">
+If variables are related, what pattern does that relationship follow?
+</span>
+
 ---
 
 class: inverse, center, large
@@ -1105,7 +1149,8 @@ plot_growth_curves <- function(x_initial, x_end, x_by, log_factor, show_legend =
         logarithmic = "solid"
       )
     ) +
-    theme_void(base_size = 14) +
+    theme_minimal(base_size = 14) +
+    labs(x = "input", y = "output") +
     theme(legend.position = "bottom", legend.title = element_blank())
   
   ggplotly(p, tooltip = "text", height = 500, width = 750) %>% layout(
@@ -1116,7 +1161,7 @@ plot_growth_curves <- function(x_initial, x_end, x_by, log_factor, show_legend =
       title = list(text = ""),
       orientation = "h",
       x = 0.5, xanchor = "center",
-      y = 0, yanchor = "top"
+      y = 0.02, yanchor = "top"
     )
   )
 }
@@ -1190,6 +1235,32 @@ plot_growth_curves(x_initial = x_initial, x_end = x_end, x_by = x_by, log_factor
 
 ---
 
+## 4. Shapes of Change
+
+<span style="font-size: 28px;">Depending on context, changes in inputs to outputs can be very different.</span> <br>
+
+--
+
+<span style="font-size: 28px;">Recognizing the shape of change helps you understand: </span> 
+
+<ul style="font-size: 22px; line-height: 1.4;"> 
+  <li>whether progress will be steady or accelerating</li> 
+  <li>when gains may slow down or speed up unexpectedly</li> 
+  <li>how small inputs can sometimes create outsized effects, or hit limits</li> 
+</ul>
+
+--
+
+<span style="font-size: 24px;">Early in the process, it’s hard to tell which curve you're on. Misjudging it can lead to frustration or unrealistic expectations.</span>
+
+--
+
+<br>
+<span style="font-size: 24px;">Our expectations shape how we interpret new information.</span>
+
+
+---
+
 class: inverse, center, large
 
 <h1 style="font-size: 100px; margin-top: 50px; font-family: Georgia, serif;">V</h1>
@@ -1201,8 +1272,8 @@ class: inverse, center, large
 --
 <h2 style="font-size: 60px;">Expectations and Reality</h2>
 
----
 
+---
 
 ## 5. Bias
 
@@ -1246,7 +1317,7 @@ Publication bias: Studies with "positive" results are more likely to be publishe
 
 ---
 
-## 5. Bias
+## 5. Bias: Expectations and Reality
 
 The Self-Reinforcing Feedback Loop of Bias
 
@@ -1284,7 +1355,7 @@ div(
 
 ### Consequence of the Self-Reinforcing Feedback Loop of Bias
 
-Conceptual Edition
+The Bias Escalation Curve: Conceptual Edition
 
 ```{r bias-feedback-loop3, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -1366,7 +1437,7 @@ plot_ly(width = 700, height = 500) %>%
 
 ### Consequence of the Self-Reinforcing Feedback Loop of Bias
 
-Carnivore Edition
+The Bias Escalation Curve: Carnivore Edition
 
 ```{r bias-feedback-carni2, echo=FALSE, message=FALSE, warning=FALSE}
 ## parameters -----------------------------------------------------------
@@ -1393,7 +1464,6 @@ dot_df <- tibble(
   frame      = 0
 )
 
-## static plot ----------------------------------------------------------
 plot_ly(width = 750, height = 500) %>%
   # plot the two starting dots
   add_markers(
@@ -1510,7 +1580,7 @@ plot_ly(width = 750, height = 500) %>%
 
 ### Consequence of the Self-Reinforcing Feedback Loop of Bias
 
-Vegan Edition
+The Bias Escalation Curve: Vegan Edition
 
 ```{r bias-feedback-vegan2, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -1624,6 +1694,33 @@ layout(
   )
 ) 
 ```
+
+
+---
+
+## 5. Bias
+
+
+<span style="font-size: 28px;">Our minds filter reality through prior beliefs and assumptions, or <b>bias</b>.</span> 
+<br>
+
+<span style="font-size: 28px;">Recognizing bias helps you understand: </span>
+
+<ul style="font-size: 20px; line-height: 1.2;"> 
+  <li>how it can shape attention and memory</li> 
+  <li>why we favor evidence that fits what we already believe</li> 
+  <li>how feedback loops can reinforce or shift our views over time</li>
+  <li>how bias can escalate, growing from subtle differences in interpretation to extreme positions over time</li>
+</ul>
+--
+
+<span style="font-size: 22px;">Without awareness, bias can change how we see the world, gradually strengthening and pushing us further from reality.</span>
+
+--
+
+<span style="font-size: 22px;">From time to time ask yourself:</span>
+
+>Where am I on the Bias Escalation Curve?
 
 
 ---
