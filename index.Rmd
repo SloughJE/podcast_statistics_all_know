@@ -712,6 +712,8 @@ class: inverse, center, large, middle
 <b>Randomized Controlled Trial</b>
 
 <ul style="font-size: 80%;">
+<li><b>Test:</b> Does A cause B? Does melatonin increase sleep duration?</li>
+<br>
 <li><b>Randomization:</b> Assign by chance to treatment or control</li>
 <br>
 <li><b>Control:</b> Keep other factors balanced across groups (via randomization)</li>
@@ -720,7 +722,6 @@ class: inverse, center, large, middle
 <br>
 <li><b>Comparison:</b> Check for outcome differences between groups</li>
 </ul>
-
 </div>
 ]
 
@@ -747,7 +748,7 @@ p_cause <- ggplot(df_exp, aes(x = group, y = outcome, color = group)) +
   stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.25, linewidth = 1) +
   labs(
     title = "Simplified Experimental Outcome",
-    y = "Outcome",
+    y = "sleep duration",
     x = ""
   ) +
   theme_minimal(base_size = 10) +
@@ -941,80 +942,144 @@ class: inverse, center, large
 ## 4. Shapes of Change
 
 
-```{r linear_non, echo = FALSE, message = FALSE, warning = FALSE}
+```{r growth_curve_function, echo = FALSE, message = FALSE, warning = FALSE}
+
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(ggplot2)
+library(plotly)
 
-curve_data <- data.frame(x = seq(0, 5, 0.1)) %>%
-  mutate(
-    linear = 4 * x,
-    exponential = 2^x - 1,               # shift so at x=0, y=0
-    quadratic = x^2,
-    logarithmic = (log(x) - log(0.1)) * 3.5
-  )
-
-long_data <- curve_data %>%
-  pivot_longer(-x, names_to = "type", values_to = "y")
-
-# Define shorthand mapping
-shorthand <- c(
-  linear = "Steady progress (each step adds the same)",
-  exponential = "Snowball effect (growth feeds more growth)",
-  quadratic = "Accelerating effort (small changes early, big jumps later)",
-  logarithmic = "Diminishing returns (fast early gains, then tapering off)"
-)
-
-p <- ggplot(long_data, aes(x = x, y = y, color = type, linetype = type, group = type, 
-                           text = paste0(str_to_title(type),"\n", shorthand[type]))) +
-  geom_line(size = 1.5) +
-  scale_color_manual(
-    values = c(
-      linear = "grey50",
-      exponential = "steelblue",
-      quadratic = "darkgreen",
-      logarithmic = "darkred"
-    ),
-    labels = c(
-      linear = "Linear",
-      exponential = "Exponential",
-      quadratic = "Quadratic",
-      logarithmic = "Logarithmic"
+plot_growth_curves <- function(x_initial, x_end, x_by, log_factor, show_legend = TRUE) {
+  
+  # Base data
+  curve_data <- data.frame(x = seq(x_initial, x_end, x_by)) %>%
+    mutate(
+      linear = 4 * x,
+      exponential = 2^x - 1,               
+      quadratic = x^2
     )
-  ) +
-  scale_linetype_manual(
-    values = c(
-      linear = "dashed",
-      exponential = "solid",
-      quadratic = "dashed",
-      logarithmic = "solid"
-    ),
-    labels = c(
-      linear = "Linear",
-      exponential = "Exponential",
-      quadratic = "Quadratic",
-      logarithmic = "Logarithmic"
-    )
-  ) +
-  theme_void(base_size = 14) +
-  theme(legend.position = "bottom", legend.title = element_blank())
-
-
-ggplotly(p, tooltip = "text", height = 500, width = 750) %>% layout(
-  xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
-  yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
-  legend = list(
-    title = list(text = ""),
-    orientation = "h",
-    x = 0.5, xanchor = "center",
-    y = 0, yanchor = "top"
+  
+  # Extended logarithmic
+  x_extended <- seq(x_initial, x_end + x_by, x_by)  # one extra point
+  logarithmic_extended <- (log(x_extended) - log(x_by)) * log_factor
+  logarithmic_shifted <- logarithmic_extended[-1]  # drop first, keeps n values
+  curve_data$logarithmic <- logarithmic_shifted
+  
+  # Long format
+  long_data <- curve_data %>%
+    pivot_longer(-x, names_to = "type", values_to = "y")
+  
+  # Shorthand descriptions
+  shorthand <- c(
+    linear = "Steady progress (each step adds the same)",
+    exponential = "Snowball effect (growth feeds more growth)",
+    quadratic = "Accelerating effort (small changes early, big jumps later)",
+    logarithmic = "Diminishing returns (fast early gains, then tapering off)"
   )
-)
+  
+  # Plot
+  p <- ggplot(long_data, aes(x = x, y = y, color = type, linetype = type, group = type, 
+                             text = paste0(str_to_title(type), "\n", shorthand[type]))) +
+    geom_line(size = 1.5) +
+    scale_color_manual(
+      values = c(
+        linear = "grey50",
+        exponential = "steelblue",
+        quadratic = "darkgreen",
+        logarithmic = "darkred"
+      )
+    ) +
+    scale_linetype_manual(
+      values = c(
+        linear = "dashed",
+        exponential = "solid",
+        quadratic = "dashed",
+        logarithmic = "solid"
+      )
+    ) +
+    theme_void(base_size = 14) +
+    theme(legend.position = "bottom", legend.title = element_blank())
+  
+  ggplotly(p, tooltip = "text", height = 500, width = 750) %>% layout(
+    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
+    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
+    showlegend = show_legend,
+    legend = list(
+      title = list(text = ""),
+      orientation = "h",
+      x = 0.5, xanchor = "center",
+      y = 0, yanchor = "top"
+    )
+  )
+}
 
+```
+
+```{r growth_curves1, echo = FALSE, message = FALSE, warning = FALSE}
+
+x_initial = 0
+x_end = 0.4
+x_by = 0.01
+log_factor = 1.5
+show_legend = FALSE
+
+plot_growth_curves(x_initial = x_initial, x_end = x_end, x_by = x_by, log_factor = log_factor, show_legend = show_legend)
 
 
 ```
 
+---
+## 4. Shapes of Change
+
+
+```{r growth_curves2, echo = FALSE, message = FALSE, warning = FALSE}
+
+x_initial = 0
+x_end = 2.5
+x_by = 0.01
+log_factor = 1.5
+show_legend = FALSE
+
+plot_growth_curves(x_initial = x_initial, x_end = x_end, x_by = x_by, log_factor = log_factor, show_legend = show_legend)
+
+
+```
+
+---
+## 4. Shapes of Change
+
+
+```{r growth_curves3, echo = FALSE, message = FALSE, warning = FALSE}
+
+x_initial = 0
+x_end = 5
+x_by = 0.01
+log_factor = 1.5
+show_legend = FALSE
+
+plot_growth_curves(x_initial = x_initial, x_end = x_end, x_by = x_by, log_factor = log_factor, show_legend = show_legend)
+
+
+```
+
+---
+
+## 4. Shapes of Change
+
+
+```{r growth_curves4, echo = FALSE, message = FALSE, warning = FALSE}
+
+x_initial = 0
+x_end = 9
+x_by = 0.01
+log_factor = 1.5
+show_legend = TRUE
+
+plot_growth_curves(x_initial = x_initial, x_end = x_end, x_by = x_by, log_factor = log_factor, show_legend = show_legend)
+
+
+```
 
 ---
 
