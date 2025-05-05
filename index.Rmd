@@ -4,7 +4,7 @@ subtitle: |
   *Statistics for Life*
 
 author: |
-  **John Slough**  
+  **John**  
   *for* **The John & Calvin Podcast**
 
 output:
@@ -23,19 +23,21 @@ output:
 class: inverse, center, large
 
 
-<h1 style="font-size: 80px; margin-top: 150px;">Beware the Metrics</h1>
+<h1 style="font-size: 100px; margin-top: 50px; font-family: Georgia, serif;">I</h1>
+
+<h1 style="font-size: 80px; margin-top: 75px;">Neutral Metrics</h1>
 
 <hr style="margin-top: 2em; margin-bottom: 2em;">
 
 --
-<h2 style="font-size: 50px;">Misuse and Misunderstanding, Not Math, Mislead</h2>
+<h2 style="font-size: 50px;">Misuse and Misunderstandings Mislead</h2>
 
 --
 <h2 style="font-size: 40px;">mean ≠ median</h2>
 
 ---
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 ### Local bar weath distribution: 50 Patrons
 ```{r before_plotly, echo=FALSE, message=FALSE, warning=FALSE}
@@ -107,7 +109,7 @@ ggplotly(p_before, height = 450, width = 750) %>%
 
 ---
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 ### Local bar weath distribution: 50 Patrons + Billon Gezos 
 ```{r after_plotly, echo=FALSE, message=FALSE, warning=FALSE}
@@ -167,7 +169,7 @@ ggplotly(p_before, height = 450, width = 750) %>%
 ```
 ---
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 
 
@@ -180,7 +182,7 @@ ggplotly(p_before, height = 450, width = 750) %>%
 ---
 
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 
 ### Impact of a $150B Outlier on Mean vs. Median — Across Sample Sizes
@@ -209,7 +211,7 @@ df_summary %>%
 
 ---
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 A more realistic example
 
@@ -252,7 +254,7 @@ A more realistic example
 
 ---
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 ### Pareto Distribution
 
@@ -315,7 +317,7 @@ ggplotly(p_pareto, height = 450, width = 750) %>%
 
 ---
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 ### Pareto Distribution (x-axis limited)
 
@@ -363,7 +365,7 @@ ggplotly(p_pareto, height = 450, width = 750) %>%
 
 ---
 
-## 1. Mean vs Median
+## 1. Neutral Metrics: Mean vs Median
 
 ### Normal Distribution
 
@@ -383,7 +385,7 @@ annotation_text <- paste0(
   format(round(med_b),  big.mark = ",")
 )
 
-p_pareto <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
+p_norm_wealth <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
   geom_histogram(bins = 50, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
   geom_vline(xintercept = mean(wealth_normal), colour = mean_color,   linewidth = 1) +
   geom_vline(xintercept = median(wealth_normal), colour = median_color, linewidth = 1, linetype   = "dashed") +
@@ -401,7 +403,7 @@ p_pareto <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
         plot.title          = element_text(margin = margin(b = 5)))
 
 
-ggplotly(p_pareto, height = 450, width = 750) %>%
+ggplotly(p_norm_wealth, height = 450, width = 750) %>%
   layout(
     title = list(
       text    = paste0("mean ≈ median"),
@@ -423,35 +425,47 @@ ggplotly(p_pareto, height = 450, width = 750) %>%
 ```
 
 ---
-## 1. Mean vs Median
+## 1. Neutral Metrics
 
+
+<span style="font-size: 32px;">
+A metric is just a calculated number.
+</span>
 <br>
 
-## Extreme Outliers 
+<span style="font-size: 32px;">
+It can be misused, but only if its not understood.
 <br>
+<br>
+<br>
+</span>
 
 --
 
-## Symmetric vs Skewed
-<br>
+<span style="font-size: 32px;">
+To understand any metric, you must know:
+</span>
 
+<ul style="font-size: 26px; line-height: 1.4;">
+  <li>how it's calculated</li>
+  <li>the assumptions it relies on</li>
+  <li>the <b>distribution</b> of the data</li>
+</ul>
 
---
-
-
-## the Shape of the Data
 
 ---
 class: inverse, center, large
 
 
-<h1 style="font-size: 80px; margin-top: 200px;">Distributions</h1>
+<h1 style="font-size: 100px; margin-top: 50px; font-family: Georgia, serif;">II</h1>
+
+<h1 style="font-size: 80px; margin-top: 75px;">Distributions</h1>
 
 <hr style="margin-top: 2em; margin-bottom: 2em;">
 
 --
-<h2 style="font-size: 60px;">The Foundation Beneath Every Statistic</h2>
-
+<h2 style="font-size: 55px;">What's Typical, What's Rare, What's Extreme</h2>
+<h2 style="font-size: 40px;">Theoretically</h2>
 
 ---
 
@@ -467,6 +481,78 @@ class: inverse, center, large
 
 - **Tail Behavior**  
   How likely are extreme or outlier values?
+
+---
+
+## 2. Distributions
+
+### Theoretical models of where values are likely to occur
+
+
+```{r normal_hist_to_dist1, echo=FALSE, message=FALSE, warning=FALSE}
+
+p_norm_wealth <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
+  geom_histogram(bins = 50, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
+  scale_x_continuous(labels = dollar_format()) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,NA),
+                     breaks = scales::breaks_pretty(),
+                     labels = scales::label_comma()) +
+  labs(title    = NULL, x= "wealth (USD)", y = "Count") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid.major.y = element_line(color = "grey90"),
+        panel.grid.major.x = element_blank(),
+        axis.line           = element_line(color = "black"),
+        axis.ticks          = element_line(color = "black"),
+        axis.ticks.length   = unit(0.2, "cm"),
+        plot.title          = element_text(margin = margin(b = 5)))
+
+
+ggplotly(p_norm_wealth, height = 450, width = 750) # %>%
+  
+  
+```
+
+---
+
+## 2. Distributions
+
+### Theoretical models of where values are likely to occur
+
+
+```{r normal_hist_to_dist2, echo=FALSE, message=FALSE, warning=FALSE}
+
+p_norm_density <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
+  geom_histogram(aes(y = ..density..), bins = 50, fill = fill_color, color = edge_color, alpha = 0.5, boundary = 0, closed = "left") +
+  stat_density(geom = "line", color = "steelblue", size = 1.2, adjust = 1) +
+  labs(title = "Histogram with Distribution Outline", x = "wealth (USD)", y = "Density") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.y = element_blank())
+
+ggplotly(p_norm_density, height = 450, width = 750) # %>%
+  
+  
+```
+
+---
+
+## 2. Distributions
+
+### Theoretical models of where values are likely to occur
+
+
+```{r normal_hist_to_dist3, echo=FALSE, message=FALSE, warning=FALSE}
+
+p_norm_only_density <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
+  geom_density(fill = "steelblue", alpha = 0.6,adjust = 3) +
+  labs(title = "Smoothed Distribution", x = "wealth (USD)", y = "Density") +
+  theme_minimal(base_size = 14)+
+  theme(axis.text.y = element_blank())
+
+ggplotly(p_norm_only_density, height = 450, width = 750)
+
+  
+  
+```
 
 ---
 
@@ -523,8 +609,9 @@ $$
 
 class: inverse, center, large
 
+<h1 style="font-size: 100px; margin-top: 50px; font-family: Georgia, serif;">III</h1>
 
-<h1 style="font-size: 80px; margin-top: 150px;">Correlation, Confounding, Causation</h1>
+<h1 style="font-size: 80px; margin-top: 75px;">Correlation, Confounding, Causation</h1>
 
 <hr style="margin-top: 2em; margin-bottom: 2em;">
 
@@ -588,8 +675,11 @@ model_both <- lm(reading ~ shoe + age, data = df)
 p_reading = ggplot(df, aes(shoe, reading)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") +
-  labs(title = "Shoe Size vs Reading Score") +
-  theme_minimal()
+  labs(
+      title = "Shoe Size vs Reading Score",
+      x = "shoe size",
+      y = "reading score"
+    )   + theme_minimal()
 
 ggplotly(p_reading) %>%
   config(displayModeBar = FALSE)
@@ -610,8 +700,11 @@ ggplotly(p_reading) %>%
 p_reading = ggplot(df, aes(shoe, reading)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") +
-  labs(title = "Shoe Size vs Reading Score") +
-  theme_minimal()
+  labs(
+      title = "Shoe Size vs Reading Score",
+      x = "shoe size",
+      y = "reading score"
+    )   + theme_minimal()
 
 ggplotly(p_reading) %>%
   config(displayModeBar = FALSE)
@@ -628,8 +721,11 @@ ggplotly(p_reading) %>%
 p_age = ggplot(df, aes(age, reading)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, color = "red") +
-  labs(title = "Age vs Reading Score") +
-  theme_minimal()
+  labs(
+      title = "Age vs Reading Score",
+      x = "age",
+      y = "reading score"
+    )   + theme_minimal()
 
 ggplotly(p_age) %>%
   config(displayModeBar = FALSE)
@@ -649,8 +745,11 @@ ggplotly(p_age) %>%
 p_reading = ggplot(df, aes(shoe, reading)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") +
-  labs(title = "Shoe Size vs Reading Score") +
-  theme_minimal()
+  labs(
+      title = "Age vs Reading Score",
+      x = "shoe size",
+      y = "reading score"
+    )   + theme_minimal()
 
 ggplotly(p_reading) %>%
   config(displayModeBar = FALSE)
@@ -668,8 +767,11 @@ ggplotly(p_reading) %>%
 p_age = ggplot(df, aes(age, reading)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, color = "red") +
-  labs(title = "Age vs Reading Score") +
-  theme_minimal()
+  labs(
+      title = "Age vs Reading Score",
+      x = "age",
+      y = "reading score"
+    )   + theme_minimal()
 
 ggplotly(p_age) %>%
   config(displayModeBar = FALSE)
@@ -691,6 +793,10 @@ age_p  <- broom::tidy(model_both) %>% filter(term == "age") %>% pull(p.value) %>
 Shoe p-value: `r shoe_p`; Age p-value: **`r age_p`**
 
 > **Result:** Once age is included, shoe size is no longer significant
+
+<br>
+Shoe size is a **confounding** variable.
+
 ]
 
 
@@ -930,8 +1036,9 @@ Video: <a href="https://www.youtube.com/watch?v=7kGnfXXIKZM">YouTube</a>
 
 class: inverse, center, large
 
+<h1 style="font-size: 100px; margin-top: 50px; font-family: Georgia, serif;">IV</h1>
 
-<h1 style="font-size: 80px; margin-top: 200px;">Shapes of Change</h1>
+<h1 style="font-size: 80px; margin-top: 75px;">Shapes of Change</h1>
 
 <hr style="margin-top: 2em; margin-bottom: 2em;">
 
@@ -1083,6 +1190,20 @@ plot_growth_curves(x_initial = x_initial, x_end = x_end, x_by = x_by, log_factor
 
 ---
 
+class: inverse, center, large
+
+<h1 style="font-size: 100px; margin-top: 50px; font-family: Georgia, serif;">V</h1>
+
+<h1 style="font-size: 80px; margin-top: 75px;">Bias</h1>
+
+<hr style="margin-top: 2em; margin-bottom: 2em;">
+
+--
+<h2 style="font-size: 60px;">Expectations and Reality</h2>
+
+---
+
+
 ## 5. Bias
 
 **Bias** is the difference between the expected value of an estimator and the true value of the parameter it estimates.
@@ -1105,7 +1226,7 @@ Where:
 
 ---
 
-Bias doesn’t just shift your first guess.
+Bias doesn't just shift your first guess.
 It filters what you see next — making you even more biased over time
 
 
@@ -1503,3 +1624,22 @@ layout(
   )
 ) 
 ```
+
+
+---
+
+
+<h1 style="margin-bottom: 0em;">Neutral Metrics</h1>
+<h4 style="margin-top: 0; font-weight: bold;">Misuse and Misunderstandings Mislead</h2>
+
+<h1 style="margin-bottom: 0em;">Distributions</h1>
+<h4 style="margin-top: 0; font-weight: bold;">What's Typical, What's Rare, What's Extreme - Theoretically</h2>
+
+<h1 style="margin-bottom: 0em;">Correlation, Confounding, Causation</h1>
+<h4 style="margin-top: 0; font-weight: bold;">and the Stories We Tell</h2>
+
+<h1 style="margin-bottom: 0em;">Shapes of Change</h1>
+<h4 style="margin-top: 0; font-weight: bold;">What Curve, What Point</h2>
+
+<h1 style="margin-bottom: 0em;">Bias</h1>
+<h4 style="margin-top: 0; font-weight: bold;">Expectations and Reality</h2>
