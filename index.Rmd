@@ -1328,7 +1328,7 @@ p_bias = ggplot(summary_df, aes(x = type, y = mean, color = type)) +
        x = "",
        caption = "Dashed line = true value (reality)") +
   scale_color_manual(values = c("steelblue", "tomato")) +
-  theme_minimal(base_size = 10) +
+  theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
 
@@ -1342,7 +1342,7 @@ ggplotly(p_bias, height = 300, width = 400) %>%
         xref = "paper",
         yref = "paper",
         showarrow = FALSE,
-        font = list(size = 10)
+        font = list(size = 12)
       )
     )
   ) %>%  config(displayModeBar = FALSE)
@@ -1350,6 +1350,137 @@ ggplotly(p_bias, height = 300, width = 400) %>%
 
 ```
 </div>
+---
+
+<div style="display: flex; justify-content: center;">
+```{r bias_concept1, echo = FALSE, message = FALSE, warning = FALSE}
+
+set.seed(123)
+n <- 20
+true_value <- 100
+
+# Generate data
+unbiased <- rnorm(n, mean = true_value, sd = 5)
+biased <- rnorm(n, mean = true_value + 10, sd = 5)
+
+df <- data.frame(
+  estimate = c(unbiased, biased),
+  type = rep(c("Unbiased", "Biased"), each = n)
+)
+
+# Calculate group means and confidence intervals
+summary_df <- df %>%
+  group_by(type) %>%
+  summarise(
+    mean = mean(estimate),
+    sd = sd(estimate),
+    se = sd / sqrt(n),
+    lower = mean - 1.96 * se,
+    upper = mean + 1.96 * se
+  )
+
+# Plot
+p_bias = ggplot(summary_df, aes(x = type, y = mean, color = type)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 1) +
+  geom_hline(yintercept = true_value, linetype = "dashed", color = "black") +
+  labs(title = "Conceptual Illustration of Bias",
+       y = "Average Estimate",
+       x = "",
+       caption = "Dashed line = true value (reality)") +
+  scale_color_manual(values = c("steelblue", "tomato")) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none")
+
+
+ggplotly(p_bias, height = 400, width = 500) %>%
+  layout(
+    annotations = list(
+      list(
+        text = "Dashed line = true value (reality)",
+        x = 0.05,
+        y = 0.15,
+        xref = "paper",
+        yref = "paper",
+        showarrow = FALSE,
+        font = list(size = 14)
+      )
+    )
+  ) %>%  config(displayModeBar = FALSE)
+
+
+```
+</div>
+
+---
+
+<div style="display: flex; justify-content: center;">
+```{r bias_concept2, echo = FALSE, message = FALSE, warning = FALSE}
+
+library(plotly)
+ggplotly(p_bias, height = 400, width = 500) %>%
+  layout(
+    annotations = list(
+      list(
+        x = 0.24, y = summary_df$mean[summary_df$type == "Biased"]-0.15,
+        xref = "paper", yref = "y",
+        text = TeX("E[\\hat{\\theta}] \\text{ (biased)}"),
+        showarrow = TRUE,
+        arrowhead = 2,
+        ax = -60, ay = -30,
+        font = list(size = 14, color = "black")
+      ),
+      list(
+        x = 0.75, y = summary_df$mean[summary_df$type == "Unbiased"]-0.08,
+        xref = "paper", yref = "y",
+        text = TeX("E[\\hat{\\theta}] \\text{ (unbiased)}"),
+        showarrow = TRUE,
+        arrowhead = 2,
+        ax = 60, ay = -30,
+        font = list(size = 14, color = "black")
+      ),
+      list(
+        x = 0.5, y = true_value + 6,
+        xref = "paper", yref = "y",
+        text = TeX("\\text{Bias} = E[\\hat{\\theta}] - \\theta"),
+        showarrow = FALSE,
+        font = list(size = 16, color = "black")
+      ),
+      list(
+        x = 0.3, y = true_value + 0.5,
+        xref = "paper", yref = "y",
+        text = TeX("\\text{True value} (\\theta)"),
+        showarrow = FALSE,
+        font = list(size = 14, color = "black")
+      )
+    )
+  ) %>%
+  config(mathjax = 'cdn') %>%  config(displayModeBar = FALSE)
+
+
+```
+</div>
+
+
+
+$$
+\text{Bias} = \mathbb{E}[\hat{\theta}] - \theta
+$$
+.pull-left[
+**Biased estimator**
+
+$$
+\text{Bias} = \mathbb{E}[\hat{\theta}] - \theta
+$$
+]
+
+.pull-right[
+**Unbiased estimator**
+
+$$
+\text{Bias} = \mathbb{E}[\hat{\theta}] - \theta
+$$
+]
 
 ---
 
@@ -1420,9 +1551,10 @@ div(
 
 ---
 
-### Consequence of the Self-Reinforcing Feedback Loop of Bias
+### The Bias Escalation Curve: Conceptual Edition
 
-The Bias Escalation Curve: Conceptual Edition
+Consequence of the Self-Reinforcing Feedback Loop of Bias
+
 
 ```{r bias-feedback-loop3, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -1493,7 +1625,7 @@ plot_ly(width = 700, height = 500) %>%
     easing     = "linear",
     redraw     = FALSE
   ) %>%
-  animation_slider(currentvalue = list(prefix = "Time "))
+  animation_slider(currentvalue = list(prefix = "Time ")) %>%  config(displayModeBar = FALSE)
 
 
 ```
@@ -1502,9 +1634,10 @@ plot_ly(width = 700, height = 500) %>%
 ---
 
 
-### Consequence of the Self-Reinforcing Feedback Loop of Bias
+### The Bias Escalation Curve: Carnivore Edition
 
-The Bias Escalation Curve: Carnivore Edition
+Consequence of the Self-Reinforcing Feedback Loop of Bias
+
 
 ```{r bias-feedback-carni2, echo=FALSE, message=FALSE, warning=FALSE}
 ## parameters -----------------------------------------------------------
@@ -1639,15 +1772,16 @@ plot_ly(width = 750, height = 500) %>%
         showarrow = FALSE, font = list(size = 12), xanchor = "left"
       )
     )
-  )
+  ) %>%  config(displayModeBar = FALSE)
 ```
 
 ---
 
 
-### Consequence of the Self-Reinforcing Feedback Loop of Bias
+### The Bias Escalation Curve: Vegan Edition
 
-The Bias Escalation Curve: Vegan Edition
+Consequence of the Self-Reinforcing Feedback Loop of Bias
+
 
 ```{r bias-feedback-vegan2, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -1759,7 +1893,7 @@ layout(
       showarrow = FALSE, font = list(size = 12), xanchor = "left"
     )
   )
-) 
+) %>%  config(displayModeBar = FALSE)
 ```
 
 
