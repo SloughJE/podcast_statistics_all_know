@@ -1277,17 +1277,17 @@ class: inverse, center, large
 
 ## 5. Bias
 
-<span style="font-size: 20px;">**Bias** is the systematic difference between the expected result of an estimator and the true underlying value it's trying to measure.</span>
+<span style="font-size: 20px;">Statistical bias is the systematic difference between the expected value of an estimator and the true value of the parameter being estimated.</span>
 <br>
 
 --
 
-<span style="font-size: 20px;">It's the **consistent gap** between what your method tends to estimate and the actual truth — not just random error, but a built-in shift.</span>
+<span style="font-size: 20px;">It's the **consistent gap** between what your method tends to estimate and the actual truth, not just random error.</span>
 <br>
 
 --
 
-<span style="font-size: 20px;">Bias means you’re consistently off target because of how you measure, think, or sample — and you don’t realize it.</span>
+<span style="font-size: 20px;">Bias means you’re consistently off, because of how you measure, think, or sample — and you don’t realize it.</span>
 
 --
 
@@ -1486,12 +1486,7 @@ $$
 
 ## 5. Bias
 
-
-Bias doesn't just shift your first guess.
-
-It filters what you see next, making you even more biased over time
-
-There are many types of bias including:
+### Types of Bias
 
 --
 
@@ -1553,7 +1548,7 @@ div(
 
 ### The Bias Escalation Curve: Conceptual Edition
 
-Consequence of the Self-Reinforcing Feedback Loop of Bias
+Consequence of The Self-Reinforcing Feedback Loop of Bias
 
 
 ```{r bias-feedback-loop3, echo=FALSE, message=FALSE, warning=FALSE}
