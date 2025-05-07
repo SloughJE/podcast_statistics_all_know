@@ -256,6 +256,59 @@ A more realistic example
 
 ## 1. Neutral Metrics: Mean vs Median
 
+#### Gross Domestic Product - GDP
+
+`GDP = C + I + G + (X−M)`  
+C is consumer spending, I is business investment, G is government spending, and (X−M) is net exports ([Investopedia](https://www.investopedia.com/articles/investing/051415/how-calculate-gdp-country.asp)).
+
+GDP per capita = GDP ÷ population = **average** output per person
+
+.pull-left[
+<center>
+U.S. GDP per Capita<br>
+<img src="assets/gdp_per_capita.png" style="width:100%;"><br>
+<span style="font-size: 50%;">
+<a href="https://www.statista.com/statistics/263601/gross-domestic-product-gdp-per-capita-in-the-united-states/">statista</a>
+</span>
+</center>
+]
+
+---
+
+## 1. Neutral Metrics: Mean vs Median
+
+#### Gross Domestic Product - GDP
+
+`GDP = C + I + G + (X−M)`  
+C is consumer spending, I is business investment, G is government spending, and (X−M) is net exports ([Investopedia](https://www.investopedia.com/articles/investing/051415/how-calculate-gdp-country.asp)).
+
+GDP per capita = GDP ÷ population = **average** output per person
+
+.pull-left[
+<center>
+U.S. GDP per Capita<br>
+<img src="assets/gdp_per_capita.png" style="width:100%;"><br>
+<span style="font-size: 50%;">
+<a href="https://www.statista.com/statistics/263601/gross-domestic-product-gdp-per-capita-in-the-united-states/">statista</a>
+</span>
+</center>
+]
+
+
+.pull-right[
+<center>
+<img src="assets/personal_wealth_usa.png" style="width:100%;"><br>
+<span style="font-size: 50%;">
+By <a href="//commons.wikimedia.org/wiki/User:RCraig09" title="User:RCraig09">RCraig09</a> - <span>Own work</span>, 
+<a href="https://creativecommons.org/licenses/by-sa/4.0" title="Creative Commons Attribution-Share Alike 4.0">CC BY-SA 4.0</a>, 
+<a href="https://commons.wikimedia.org/w/index.php?curid=137146870">Link</a>
+</span>
+</center>
+]
+
+---
+## 1. Neutral Metrics: Mean vs Median
+
 ### Pareto Distribution
 
 ```{r pareto_full, echo=FALSE, message=FALSE, warning=FALSE}
