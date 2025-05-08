@@ -847,7 +847,6 @@ class: inverse, center, large, middle
 
 <h1 style="font-size: 80px; ">Causation</h1>
 
-
 ---
 ### Causation: How do we test if A causes B?
 <hr style="border: 0; height: 1px; background: lightgray;">
@@ -876,7 +875,7 @@ class: inverse, center, large, middle
 
 
 
-```{r, causality, fig.width=4.5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, causality1, fig.width=4.5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -887,7 +886,58 @@ df_exp <- tibble(
               rnorm(20, mean = 8.0, sd = 0.5))   # treatment outcomes
 )
 
-# Create plot with group-based color
+set.seed(7)
+p_cause <- ggplot(df_exp, aes(x = group, y = outcome, color = group)) +
+  geom_jitter(width = 0.04, height = 0, size = 1, alpha = 0.4) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 1) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.25, linewidth = 1) +
+  labs(
+    title = "Simplified Experimental Outcome",
+    y = "sleep duration",
+    x = ""
+  ) +
+  theme_minimal(base_size = 10) +
+  scale_color_manual(values = c("Control" = "#BFA06D", "Treatment" = mean_color)) +
+  theme(legend.position = "none")
+
+# Convert to plotly (if interactive)
+ggplotly(p_cause) %>%
+  config(displayModeBar = FALSE)
+
+```
+
+]
+
+---
+### Causation: How do we test if A causes B?
+<hr style="border: 0; height: 1px; background: lightgray;">
+
+
+.pull-left[
+<div style="margin-top: 4px;">
+
+<b>Randomized Controlled Trial</b>
+
+<ul style="font-size: 80%;">
+<li><b>Research Question:</b> Does melatonin increase sleep duration?</li>
+<br>
+<li><b>Randomized:</b> Assign subjects by chance to treatment or control group, balancing other factors</li>
+<br>
+<li><b>Controlled:</b> Control group used to compare outcomes against the treatment group</li>
+<br>
+<li><b>Trial:</b> Apply the intervention and observe outcomes. Compare groups.</li>
+</ul>
+
+</div>
+]
+
+.pull-right[
+
+
+
+```{r, causality2, fig.width=4.5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+
+set.seed(7)
 p_cause <- ggplot(df_exp, aes(x = group, y = outcome, color = group)) +
   geom_jitter(width = 0.04, height = 0, size = 1, alpha = 0.4) +
   stat_summary(fun = mean, geom = "point", shape = 18, size = 1) +
@@ -1517,19 +1567,22 @@ Bias = "none"
 
 --
 
-<div style="display: flex; justify-content: space-between; font-size: 18px;">
-  <ul style="list-style-type: disc; padding-right: 40px;">
-    <li><b>Selection bias</b>: Non-representative sample</li>
-    <li><b>Omitted variable bias</b>: Missing important factors</li>
-    <li><b>Measurement bias</b>: Data collection errors</li>
-    <li><b>Survivorship bias</b>: Ignoring those who dropped out</li>
+<div style="display: flex; font-size: 18px; gap: 20px;">
+  <ul style="list-style-type: disc; flex: 1;">
+    <li><b>Sampling bias</b>: Sample isn't representative of the population</li>
+    <li><b>Selection bias</b>: Systematic exclusion or inclusion skews results</li>
+    <li><b>Omitted variable bias</b>: Missing important factors in analysis</li>
+    <li><b>Measurement bias</b>: Data collection errors or inaccuracies</li>
+    <li><b>Confirmation bias</b>: Seeking or interpreting data to confirm beliefs</li>
   </ul>
-  <ul style="list-style-type: disc;">
-    <li><b>Recall bias</b>: Faulty memories skewing data</li>
-    <li><b>Observer bias:</b> expectations influence how observations are recorded or interpreted</li>
+  <ul style="list-style-type: disc; flex: 1;">
+    <li><b>Recall bias</b>: Faulty memories skew reported data</li>
+    <li><b>Observer bias</b>: Expectations influence how observations are recorded or interpreted</li>
+    <li><b>Survivorship bias</b>: Ignoring those who dropped out or failed</li>
     <li><b>Publication bias</b>: Only "positive" results get published</li>
   </ul>
 </div>
+
 
 --
 
