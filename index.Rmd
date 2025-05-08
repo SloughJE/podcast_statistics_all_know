@@ -131,7 +131,7 @@ ann <- list(
 p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
   geom_histogram(bins = 20, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
   #geom_vline(xintercept = mean(wealth_before), colour = mean_color,   linewidth = 1) +
-  geom_vline(xintercept = median(wealth_before), colour = median_color, linewidth = 1, linetype   = "dashed") +
+  geom_vline(xintercept = med_all, colour = median_color, linewidth = 1, linetype   = "dashed") +
   scale_x_continuous(labels = dollar_format()) +
   scale_y_continuous(expand = c(0,0), limits = c(0,NA),
                      breaks = scales::breaks_pretty(),
@@ -315,13 +315,6 @@ wealth_pareto <- rpareto(100000, scale = 10000, shape = 1.03)  # shape < 2 → h
 mean_pareto <- mean(wealth_pareto)
 med_pareto  <- median(wealth_pareto)
 
-# annotation_text <- paste0(
-#   "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
-#   format(round(mean_b), big.mark = ","), 
-#   "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
-#   format(round(med_b),  big.mark = ",")
-# )
-
 txt <- scales::comma
 ann <- list(
   list(x=0.96, y=0.94, xref='paper', yref='paper',
@@ -334,8 +327,8 @@ ann <- list(
 
 p_pareto <- ggplot(data.frame(wealth = wealth_pareto), aes(wealth)) +
   geom_histogram(bins = 100, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
-  geom_vline(xintercept = mean(wealth_pareto), colour = mean_color,   linewidth = 1,  linetype   = "dashed") +
-  geom_vline(xintercept = median(wealth_pareto), colour = median_color, linewidth = 1, linetype   = "dashed") +
+  geom_vline(xintercept = mean_pareto, colour = mean_color,   linewidth = 1,  linetype   = "dashed") +
+  geom_vline(xintercept = med_pareto, colour = median_color, linewidth = 1, linetype   = "dashed") +
   scale_x_continuous(labels = dollar_format()) +
   scale_y_continuous(expand = c(0,0), limits = c(0,NA),
                      breaks = scales::breaks_pretty(),
@@ -416,13 +409,6 @@ wealth_normal <- rnorm(100000, mean = 90000, sd = 25000)
 
 mean_normal <- mean(wealth_normal)
 med_normal  <- median(wealth_normal)
-
-# annotation_text <- paste0(
-#   "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
-#   format(round(mean_b), big.mark = ","), 
-#   "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
-#   format(round(med_b),  big.mark = ",")
-# )
 
 txt <- scales::comma
 ann <- list(
@@ -865,7 +851,7 @@ class: inverse, center, large, middle
 
 
 ---
-### How do we test if A causes B?
+### Causation: How do we test if A causes B?
 <hr style="border: 0; height: 1px; background: lightgray;">
 
 --
@@ -876,16 +862,15 @@ class: inverse, center, large, middle
 <b>Randomized Controlled Trial</b>
 
 <ul style="font-size: 80%;">
-<li><b>Test:</b> Does A cause B? Does melatonin increase sleep duration?</li>
+<li><b>Research Question:</b> Does melatonin increase sleep duration?</li>
 <br>
-<li><b>Randomization:</b> Assign by chance to treatment or control</li>
+<li><b>Randomized:</b> Assign subjects by chance to treatment or control group, balancing other factors</li>
 <br>
-<li><b>Control:</b> Keep other factors balanced across groups (via randomization)</li>
+<li><b>Controlled:</b> Control group used to compare outcomes against the treatment group</li>
 <br>
-<li><b>Treatment:</b> Apply the intervention</li>
-<br>
-<li><b>Comparison:</b> Check for outcome differences between groups</li>
+<li><b>Trial:</b> Apply the intervention and observe outcomes. Compare groups.</li>
 </ul>
+
 </div>
 ]
 
@@ -895,7 +880,6 @@ class: inverse, center, large, middle
 
 ```{r, causality, fig.width=4.5, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
 
-#fig.cap="Compare outcomes between randomized groups to estimate causal effect"
 library(ggplot2)
 library(dplyr)
 
@@ -928,10 +912,12 @@ ggplotly(p_cause) %>%
 ]
 
 <br>
+> Experiments test causality by:
 
+> randomly assigning subjects to treatment or control groups,
 
-> Experiments test causality by manipulating one factor, 
-> using randomization to balance everything else,
+> applying the intervention, 
+
 > and comparing outcomes.
 
 
@@ -992,23 +978,24 @@ plot_ly(width = 800, height = 550) %>%
       titlefont = list(size = 14, color = "red"),
       tickfont = list(color = "red"),
       title_standoff = 100
-    ),annotations = list(
-      list(
-        x = 0.01, y = .92, xref = "paper", yref = "paper",
-        text = paste0("Corr (Variable A, Variable B): ", cor_veg_sat),
-        showarrow = FALSE, font = list(size = 14, color = "black")
-      ),
-      list(
-        x = 0.01, y = .87, xref = "paper", yref = "paper",
-        text = paste0("Corr (Variable A, Variable C): ", cor_satfat),
-        showarrow = FALSE, font = list(size = 14, color = "black")
-      ),
-      list(
-        x = 0.01, y = .82, xref = "paper", yref = "paper",
-        text = paste0("Corr (Variable B, Variable C): ", cor_vegoil),
-        showarrow = FALSE, font = list(size = 14, color = "black")
-      )
     ),
+    # ),annotations = list(
+    #   list(
+    #     x = 0.01, y = .92, xref = "paper", yref = "paper",
+    #     text = paste0("Corr (Variable A, Variable B): ", cor_veg_sat),
+    #     showarrow = FALSE, font = list(size = 14, color = "black")
+    #   ),
+    #   list(
+    #     x = 0.01, y = .87, xref = "paper", yref = "paper",
+    #     text = paste0("Corr (Variable A, Variable C): ", cor_satfat),
+    #     showarrow = FALSE, font = list(size = 14, color = "black")
+    #   ),
+    #   list(
+    #     x = 0.01, y = .82, xref = "paper", yref = "paper",
+    #     text = paste0("Corr (Variable B, Variable C): ", cor_vegoil),
+    #     showarrow = FALSE, font = list(size = 14, color = "black")
+    #   )
+    # ),
     legend = list(orientation = "h", x = 0.1, y = -0.05)
   )
 
@@ -1065,18 +1052,19 @@ plot_ly(width = 800, height = 550) %>%
       titlefont = list(size = 14, color = "red"),
       tickfont = list(color = "red"),
       title_standoff = 100
-    ),annotations = list(
-      list(
-        x = 0.01, y = .92, xref = "paper", yref = "paper",
-        text = paste0("Corr (Heart Disease, Saturated Fat): ", cor_satfat),
-        showarrow = FALSE, font = list(size = 14, color = "purple")
-      ),
-      list(
-        x = 0.01, y = .87, xref = "paper", yref = "paper",
-        text = paste0("Corr (Heart Disease, Vegetable Oil): ", cor_vegoil),
-        showarrow = FALSE, font = list(size = 14, color = "black")
-      )
     ),
+    # annotations = list(
+    #   list(
+    #     x = 0.01, y = .92, xref = "paper", yref = "paper",
+    #     text = paste0("Corr (Heart Disease, Saturated Fat): ", cor_satfat),
+    #     showarrow = FALSE, font = list(size = 14, color = "purple")
+    #   ),
+    #   list(
+    #     x = 0.01, y = .87, xref = "paper", yref = "paper",
+    #     text = paste0("Corr (Heart Disease, Vegetable Oil): ", cor_vegoil),
+    #     showarrow = FALSE, font = list(size = 14, color = "black")
+    #   )
+    # ),
     legend = list(orientation = "h", x = 0.1, y = -0.05)
   )
 
@@ -1511,6 +1499,7 @@ $$
 $$
 \text{Bias} = \mathbb{E}[\hat{\theta}] - \theta
 $$
+Bias = "large"
 ]
 
 .pull-right[
@@ -1519,6 +1508,7 @@ $$
 $$
 \text{Bias} = \mathbb{E}[\hat{\theta}] - \theta
 $$
+Bias = "none"
 ]
 
 ---
@@ -1607,7 +1597,7 @@ cum_df <- bind_rows(lapply(time, function(t) {
     time_point = rep(0:t, 2),
     value      = c(truth_vals[1:(t + 1)],
                    estimate_vals[1:(t + 1)]),
-    series     = rep(c("Actual Value (Truth)", "Perceived Value (Biased)"), each = t + 1),
+    series     = rep(c("Initial Belief", "Reinforced Belief"), each = t + 1),
     frame      = t
   )
 }))
@@ -1615,7 +1605,7 @@ cum_df <- bind_rows(lapply(time, function(t) {
 dot_df <- tibble(
   time_point = c(0, 0),
   value      = c(truth_vals[1], estimate_vals[1]),
-  series     = c("Actual Value (Truth)", "Perceived Value (Biased)"),
+  series     = c("Initial Belief", "Reinforced Belief"),
   frame      = 0
 )
 
@@ -1625,7 +1615,7 @@ plot_ly(width = 700, height = 500) %>%
     data       = dot_df,
     x          = ~time_point, y = ~value, frame = ~frame, ids = ~series,
     color      = ~series,
-    colors     = c("Actual Value (Truth)" = median_color, "Perceived Value (Biased)" = mean_color),
+    colors     = c("Initial Belief" = median_color, "Reinforced Belief" = mean_color),
     marker     = list(size = 12),
     showlegend = FALSE
   ) %>%
@@ -1634,7 +1624,7 @@ plot_ly(width = 700, height = 500) %>%
     data        = cum_df,
     x           = ~time_point, y = ~value, frame = ~frame, ids = ~series,
     color       = ~series,
-    colors      = c("Actual Value (Truth)" = median_color, "Perceived Value (Biased)" = mean_color),
+    colors      = c("Initial Belief" = median_color, "Reinforced Belief" = mean_color),
     legendgroup = ~series,
     line        = list(width = 4,shape="spline", smoothing=1.3)
   ) %>%
@@ -1686,7 +1676,7 @@ cum_df <- bind_rows(lapply(time, function(t) {
     time_point = rep(0:t, 2),
     value      = c(truth_vals[1:(t + 1)],
                    estimate_vals[1:(t + 1)]),
-    series     = rep(c("Reality (Unbiased)", "Perceived Certainty (Biased)"), each = t + 1),
+    series     = rep(c("Initial Belief", "Reinforced Belief"), each = t + 1),
     frame      = t
   )
 }))
@@ -1694,7 +1684,7 @@ cum_df <- bind_rows(lapply(time, function(t) {
 dot_df <- tibble(
   time_point = c(0, 0),
   value      = c(truth_vals[1], estimate_vals[1]),
-  series     = c("Reality (Unbiased)", "Perceived Certainty (Biased)"),
+  series     = c("Initial Belief", "Reinforced Belief"),
   frame      = 0
 )
 
@@ -1703,7 +1693,7 @@ plot_ly(width = 750, height = 500) %>%
   add_markers(
     data       = dot_df,
     x          = ~time_point, y = ~value, color = ~series,
-    colors     = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    colors     = c("Initial Belief" = median_color, "Reinforced Belief" = mean_color),
     marker     = list(size = 12),
     showlegend = FALSE
   ) %>%
@@ -1711,7 +1701,7 @@ plot_ly(width = 750, height = 500) %>%
   add_lines(
     data        = cum_df,
     x           = ~time_point, y = ~value, color = ~series,
-    colors      = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    colors      = c("Initial Belief" = median_color, "Reinforced Belief" = mean_color),
     legendgroup = ~series,
     line        = list(width = 4, shape = "spline", smoothing = 1.3)
   ) %>%
@@ -1824,7 +1814,7 @@ plot_ly(width = 750, height = 500) %>%
   add_markers(
     data       = dot_df,
     x          = ~time_point, y = ~value, color = ~series,
-    colors     = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    colors     = c("Initial Belief" = median_color, "Reinforced Belief" = mean_color),
     marker     = list(size = 12),
     showlegend = FALSE
   ) %>%
@@ -1832,7 +1822,7 @@ plot_ly(width = 750, height = 500) %>%
   add_lines(
     data        = cum_df,
     x           = ~time_point, y = ~value, color = ~series,
-    colors      = c("Reality (Unbiased)" = median_color, "Perceived Certainty (Biased)" = mean_color),
+    colors      = c("Initial Belief" = median_color, "Reinforced Belief" = mean_color),
     legendgroup = ~series,
     line        = list(width = 4, shape = "spline", smoothing = 1.3)
   ) %>%
