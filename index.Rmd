@@ -1304,7 +1304,7 @@ class: inverse, center, large
 
 ## 5. Bias
 
-<span style="font-size: 20px;">Statistical bias is the systematic difference between the expected value of an estimator and the true value of the parameter being estimated.</span>
+<span style="font-size: 20px;">Statistical bias is the **systematic difference** between the expected value of an estimator and the true value of the parameter being estimated.</span>
 <br>
 
 --
@@ -1314,7 +1314,7 @@ class: inverse, center, large
 
 --
 
-<span style="font-size: 20px;">Bias means you’re consistently off, because of how you measure, think, or sample — and you don’t realize it.</span>
+<span style="font-size: 20px;">Bias means you’re consistently off, because of how you **measure, think, or sample** — and you don’t realize it.</span>
 
 --
 
@@ -1522,13 +1522,13 @@ Bias = "none"
 <div style="display: flex; justify-content: space-between; font-size: 18px;">
   <ul style="list-style-type: disc; padding-right: 40px;">
     <li><b>Selection bias</b>: Non-representative sample</li>
-    <li><b>Omitted variable bias</b>: Missing important predictors</li>
+    <li><b>Omitted variable bias</b>: Missing important factors</li>
     <li><b>Measurement bias</b>: Data collection errors</li>
     <li><b>Survivorship bias</b>: Ignoring those who dropped out</li>
   </ul>
   <ul style="list-style-type: disc;">
     <li><b>Recall bias</b>: Faulty memories skewing data</li>
-    <li><b>Observer bias</b>: Researcher expectations shape results</li>
+    <li><b>Observer bias:</b> expectations influence how observations are recorded or interpreted</li>
     <li><b>Publication bias</b>: Only "positive" results get published</li>
   </ul>
 </div>
@@ -1926,26 +1926,28 @@ layout(
 ## 5. Bias
 
 
-<span style="font-size: 28px;">Our minds filter reality through prior beliefs and assumptions, or <b>bias</b>.</span> 
+<span style="font-size: 24px;">A statistical estimate can systematically deviate from the true value, just like our beliefs. We call this bias.</span> 
 <br>
 
-<span style="font-size: 28px;">Recognizing bias helps you understand: </span>
+<span style="font-size: 24px;">By understanding the nature of bias we learn: </span>
 
 <ul style="font-size: 20px; line-height: 1.2;"> 
-  <li>how it can shape attention and memory</li> 
-  <li>why we favor evidence that fits what we already believe</li> 
-  <li>how feedback loops can reinforce or shift our views over time</li>
-  <li>how bias can escalate, growing from subtle differences in interpretation to extreme positions over time</li>
+  <li>how it can shape attention, interpretation, and memory</li> 
+  <li>why we favor evidence that confirms what we already believe</li> 
+  <li>how bias can be self-reinforcing, leading to extreme positions over time</li>
+  <li>how to better recognize our own biases</li>
 </ul>
 --
 
-<span style="font-size: 22px;">Without awareness, bias can change how we see the world, gradually strengthening and pushing us further from reality.</span>
+<span style="font-size: 22px;">Bias shapes how we see the world, gradually reinforcing itself and altering our relationship to reality.</span>
 
 --
 
+<br>
+
 <span style="font-size: 22px;">From time to time ask yourself:</span>
 
->Where am I on the Bias Escalation Curve?
+>Am I on the Bias Escalation Curve? If so, where am I on it?
 
 
 ---
