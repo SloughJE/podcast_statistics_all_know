@@ -41,6 +41,7 @@ class: inverse, center, large
 
 ### Local bar weath distribution: 50 Patrons
 ```{r before_plotly, echo=FALSE, message=FALSE, warning=FALSE}
+
 library(knitr)
 library(kableExtra)
 library(ggplot2)
@@ -60,11 +61,14 @@ edge_color   <- "#3C4756"
 mean_color   <- "#C04E3D"
 median_color <- "#BFA06D"
 
-annotation_text <- paste0(
-  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
-    format(round(mean_b), big.mark = ","), 
-  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
-    format(round(med_b),  big.mark = ",")
+txt <- scales::comma
+ann <- list(
+  list(x=0.96, y=0.94, xref='paper', yref='paper',
+       text=sprintf("<b>Mean:</b> $%s", txt(round(mean_b))),
+       font=list(size=18, color=mean_color), showarrow=FALSE, align='right'),
+  list(x=0.96, y=0.86, xref='paper', yref='paper',
+       text=sprintf("<b>Median:</b> $%s", txt(round(med_b))),
+       font=list(size=18, color=median_color), showarrow=FALSE, align='right')
 )
 
 p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
@@ -86,22 +90,14 @@ p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
 
 
 ggplotly(p_before, height = 450, width = 750) %>%
+  
   layout(
     title = list(
       text    = paste0("mean ≈ median"),
       y       = 0.9, yanchor = "top"
     ),
     margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_text,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
+    annotations = ann
   )
 
 
@@ -111,7 +107,8 @@ ggplotly(p_before, height = 450, width = 750) %>%
 
 ## 1. Neutral Metrics: Mean vs Median
 
-### Local bar weath distribution: 50 Patrons + Billon Gezos 
+### Local bar weath distribution: 50 Patrons + Billon Gezosberg
+
 ```{r after_plotly, echo=FALSE, message=FALSE, warning=FALSE}
 
 
@@ -120,13 +117,16 @@ mean_all    <- mean(all_wealths)
 med_all     <- median(all_wealths)
 
 
-annotation_with_bill <- paste0(
-  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
-     format(round(mean_all), big.mark = ","),
-  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
-     format(round(med_all),  big.mark = ",")
-)
+txt <- scales::comma
 
+ann <- list(
+  list(x=0.96, y=0.94, xref='paper', yref='paper',
+       text=sprintf("<b>Mean:</b> $%s", txt(round(mean_all))),
+       font=list(size=18, color=mean_color), showarrow=FALSE, align='right'),
+  list(x=0.96, y=0.86, xref='paper', yref='paper',
+       text=sprintf("<b>Median:</b> $%s", txt(round(med_all))),
+       font=list(size=18, color=median_color), showarrow=FALSE, align='right')
+)
 
 p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
   geom_histogram(bins = 20, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
@@ -147,24 +147,18 @@ p_before <- ggplot(data.frame(wealth = wealth_before), aes(wealth)) +
         axis.ticks.length   = unit(0.2, "cm"),
         plot.title          = element_text(margin = margin(b = 5)))
 
+
 ggplotly(p_before, height = 450, width = 750) %>%
+  
   layout(
     title = list(
       text    = paste0("mean ≠ median"),
       y       = 0.9, yanchor = "top"
     ),
     margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_with_bill,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
+    annotations = ann
   )
+
   
 ```
 ---
@@ -259,7 +253,7 @@ A more realistic example
 #### Gross Domestic Product - GDP
 
 `GDP = C + I + G + (X−M)`  
-C is consumer spending, I is business investment, G is government spending, and (X−M) is net exports ([Investopedia](https://www.investopedia.com/articles/investing/051415/how-calculate-gdp-country.asp)).
+**C** is consumer spending, **I** is business investment, **G** is government spending, and (**X−M**) is net exports ([Investopedia](https://www.investopedia.com/articles/investing/051415/how-calculate-gdp-country.asp)).
 
 GDP per capita = GDP ÷ population = **average** output per person
 
@@ -280,7 +274,7 @@ U.S. GDP per Capita<br>
 #### Gross Domestic Product - GDP
 
 `GDP = C + I + G + (X−M)`  
-C is consumer spending, I is business investment, G is government spending, and (X−M) is net exports ([Investopedia](https://www.investopedia.com/articles/investing/051415/how-calculate-gdp-country.asp)).
+**C** is consumer spending, **I** is business investment, **G** is government spending, and (**X−M**) is net exports ([Investopedia](https://www.investopedia.com/articles/investing/051415/how-calculate-gdp-country.asp)).
 
 GDP per capita = GDP ÷ population = **average** output per person
 
@@ -318,14 +312,24 @@ library(VGAM)
 wealth_pareto <- rpareto(100000, scale = 10000, shape = 1.03)  # shape < 2 → heavy tail
 
 
-mean_b <- mean(wealth_pareto)
-med_b  <- median(wealth_pareto)
+mean_pareto <- mean(wealth_pareto)
+med_pareto  <- median(wealth_pareto)
 
-annotation_text <- paste0(
-  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
-  format(round(mean_b), big.mark = ","), 
-  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
-  format(round(med_b),  big.mark = ",")
+# annotation_text <- paste0(
+#   "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
+#   format(round(mean_b), big.mark = ","), 
+#   "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
+#   format(round(med_b),  big.mark = ",")
+# )
+
+txt <- scales::comma
+ann <- list(
+  list(x=0.96, y=0.94, xref='paper', yref='paper',
+       text=sprintf("<b>Mean:</b> $%s", txt(round(mean_pareto))),
+       font=list(size=18, color=mean_color), showarrow=FALSE, align='right'),
+  list(x=0.96, y=0.86, xref='paper', yref='paper',
+       text=sprintf("<b>Median:</b> $%s", txt(round(med_pareto))),
+       font=list(size=18, color=median_color), showarrow=FALSE, align='right')
 )
 
 p_pareto <- ggplot(data.frame(wealth = wealth_pareto), aes(wealth)) +
@@ -353,16 +357,7 @@ ggplotly(p_pareto, height = 450, width = 750) %>%
       y       = 0.9, yanchor = "top"
     ),
     margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_text,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
+    annotations = ann
   )
   
 ```
@@ -402,16 +397,7 @@ ggplotly(p_pareto, height = 450, width = 750) %>%
       y       = 0.9, yanchor = "top"
     ),
     margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_text,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
+    annotations = ann
   )
 
 ```
@@ -428,16 +414,25 @@ ggplotly(p_pareto, height = 450, width = 750) %>%
 wealth_normal <- rnorm(100000, mean = 90000, sd = 25000)
 
 
-mean_b <- mean(wealth_normal)
-med_b  <- median(wealth_normal)
+mean_normal <- mean(wealth_normal)
+med_normal  <- median(wealth_normal)
 
-annotation_text <- paste0(
-  "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
-  format(round(mean_b), big.mark = ","), 
-  "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
-  format(round(med_b),  big.mark = ",")
+# annotation_text <- paste0(
+#   "<span style='color:", mean_color, "'><b>Mean:</b></span> $",
+#   format(round(mean_b), big.mark = ","), 
+#   "<br><span style='color:", median_color, "'><b>Median:</b></span> $",
+#   format(round(med_b),  big.mark = ",")
+# )
+
+txt <- scales::comma
+ann <- list(
+  list(x=0.96, y=0.94, xref='paper', yref='paper',
+       text=sprintf("<b>Mean:</b> $%s", txt(round(mean_normal))),
+       font=list(size=18, color=mean_color), showarrow=FALSE, align='right'),
+  list(x=0.96, y=0.86, xref='paper', yref='paper',
+       text=sprintf("<b>Median:</b> $%s", txt(round(med_normal))),
+       font=list(size=18, color=median_color), showarrow=FALSE, align='right')
 )
-
 p_norm_wealth <- ggplot(data.frame(wealth = wealth_normal), aes(wealth)) +
   geom_histogram(bins = 50, fill = fill_color, color = edge_color, alpha = 0.7, boundary = 0, closed = "left") +
   geom_vline(xintercept = mean(wealth_normal), colour = mean_color,   linewidth = 1) +
@@ -463,16 +458,7 @@ ggplotly(p_norm_wealth, height = 450, width = 750) %>%
       y       = 0.9, yanchor = "top"
     ),
     margin      = list(t = 100),
-    annotations = list(
-      list(
-        x        = 0.95, y        = 0.9,
-        xref     = "paper", yref = "paper",
-        text     = annotation_text,
-        showarrow= FALSE,
-        align    = "right",
-        font     = list(size = 18, color = "black")
-      )
-    )
+    annotations = ann
   )
 
 ```
