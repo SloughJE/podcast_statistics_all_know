@@ -14,8 +14,6 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
-      includes:
-        after_body: "libs/remark-css/default.css"
 
 ---
 
