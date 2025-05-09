@@ -590,7 +590,64 @@ ggplotly(p_norm_only_density, height = 450, width = 750)
 ![](assets/dist_discrete.png)
 
 ---
+### Examples of Real-World Data for Distributions
 
+<div style="display: flex; font-size: 70%; justify-content: space-between;">
+
+<div style="width: 48%;">
+<p style="font-weight: bold; font-size: 150%; text-align: center;">Continuous</p>
+
+<b>Symmetric</b>
+<ul>
+  <li><b>Normal</b>: height of adults; measurement errors</li>
+  <li><b>t</b>: small sample means; A/B test differences</li>
+  <li><b>Laplace</b>: absolute daily returns of some commodities, forecast errors when most misses are small but big misses happen occasionally</li>
+  <li><b>Logistic</b>: latent error term in binary logit models</li>
+  <li><b>Cauchy</b>: ratio of two normals; resonance in physics</li>
+  <li><b>Cont. Uniform</b>: random number generators; spinning a spinner</li>
+</ul>
+
+<b>Skewed</b>
+<ul>
+  <li><b>Exponential</b>: time between earthquakes; time until customer arrival</li>
+  <li><b>Gamma</b>: rainfall amounts; moderate insurance claim sizes</li>
+  <li><b>Log-Normal</b>: income; biological growth rates</li>
+  <li><b>Weibull</b>: product lifetimes; time to failure</li>
+  <li><b>Chi-Squared</b>: sum of squared deviations; variance tests</li>
+  <li><b>Pareto</b>: wealth; city population sizes</li>
+</ul>
+
+</div>
+
+<div style="width: 48%;">
+<p style="font-weight: bold; font-size: 150%; text-align: center;">Discrete</p>
+
+<b>Fixed Trials</b>
+<ul>
+  <li><b>Binomial</b>: number of heads in coin flips; success/failure in surveys</li>
+  <li><b>Hypergeometric</b>: defective items in a sample without replacement</li>
+  <li><b>Bernoulli</b>: coin flip result; pass/fail outcome</li>
+  <li><b>Geometric</b>: number of trials until first success; sales calls until sale</li>
+</ul>
+
+<b>Counting Events</b>
+<ul>
+  <li><b>Poisson</b>: number of emails per hour; calls to a call center</li>
+  <li><b>Neg. Binomial</b>: trials until r successes; daily disease incidence with over-dispersion, accidents per driver</li>
+  <li><b>Zipf-Mandelbrot</b>: word frequency in text; website traffic by rank</li>
+</ul>
+
+<b>Uniform (special case)</b>
+<ul>
+  <li><b>Discrete Uniform</b>: rolling a fair die; picking a random card</li>
+</ul>
+
+</div>
+</div>
+
+
+---
+  
 ## 2. Distributions
 
 

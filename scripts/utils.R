@@ -253,9 +253,10 @@ p_poisson    <- make_dist_plot(rpois, lambda = 3,                     title = "P
 p_geometric  <- make_dist_plot(rgeom, prob = 0.3,                     title = "Geometric",      discrete = TRUE)
 p_nbinom     <- make_dist_plot(rnbinom, size = 5, prob = 0.5,         title = "Neg. Binomial",  discrete = TRUE)
 p_hypergeom  <- make_dist_plot(rhyper, m = 30, n = 70, k = 10,        title = "Hypergeometric", discrete = TRUE)
-p_discrete_uniform <- make_dist_plot(function(n) sample(0:9, n, replace = TRUE), 
-                                     title = "Discrete Uniform",      discrete = TRUE) +
+p_discrete_uniform <- make_dist_plot(function(n) rep(0:9, each = n / 10), 
+                                     title = "Discrete Uniform (not count-based)", discrete = TRUE) +
   scale_x_continuous(breaks = 0:10, expand = c(0.1, 0))
+
 p_bernoulli <- make_dist_plot(rbinom, size = 1, prob = 0.3, title     = "Bernoulli", discrete  = TRUE)
 
 zipf_sampler <- function(n, s = 1.1, N = 100) {
@@ -395,7 +396,7 @@ ggsave(
 ## DISCRETE
 
 p_fix1 <- p_binomial +
-  labs(y = "Trials:\nrepeated success/fail experiments") +
+  labs(y = "Trials") +
   theme(
     axis.title.y = element_text(face = "bold", angle = 0, size = 18,
                                 vjust = 0.5, hjust = 0.5,
@@ -405,11 +406,11 @@ p_fix1 <- p_binomial +
   ) %>% trim()
 
 p_fix2 <- trim(p_hypergeom)
-p_fix3 <- trim(p_discrete_uniform)
+p_fix3 <- trim(p_geometric)
 p_fix4 = trim(p_bernoulli)
 
 p_cnt1 <- p_poisson +
-  labs(y = "Counts:\n in time or space interval") +
+  labs(y = "Counts") +
   theme(
     axis.title.y = element_text(face = "bold", angle = 0, size = 18,
                                 vjust = 0.5, hjust = 0.5,
@@ -418,9 +419,9 @@ p_cnt1 <- p_poisson +
     axis.ticks.y = element_blank()
   ) %>% trim()
 
-p_cnt2 <- trim(p_geometric)
-p_cnt3 <- trim(p_nbinom)
-p_cnt4 = trim(p_zipf)
+p_cnt2 <- trim(p_nbinom)
+p_cnt3 = trim(p_zipf)
+p_cnt4 <- trim(p_discrete_uniform)
 
 p_fix1 <- p_fix1 + theme(plot.margin = margin(0, 0, 20, 0))        
 p_fix2 <- p_fix2 + theme(plot.margin = margin(20, 0, 0, 0))       
