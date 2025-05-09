@@ -216,21 +216,23 @@ A more realistic example
 - household income  
 - net worth  
 - home price  
-- monthly rent  
-- CEO compensation  
+- CEO compensation
+- inheritance amounts
 
 ### Health & Healthcare  
 - life expectancy
 - healthcare spending per person  
 - hospital bill  
-- patient out-of-pocket cost 
+- hospital stay length
+- ER wait times
 
 ]
 
 .pull-right[
-### Academics
-- test score (SAT, PISA)  
-- GPA  
+### Reputation & Influence
+- followers per influencer
+- YouTube ad revenue per channel
+- book sales per author
 - academic citations
 - speaking invitations per expert
 
@@ -239,9 +241,8 @@ A more realistic example
 - screen-time per user  
 - household energy use  
 - carbon emissions per capita  
-- YouTube ad revenue per channel
-- revenue per app in the App Store
-- Software Bug Fix Times
+- revenue per app 
+- software bug fix times
 ]
 
 ---
