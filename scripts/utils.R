@@ -240,7 +240,7 @@ p_t          <- make_dist_plot(rt, df = 5,                            title = "t
 p_log_normal <- make_dist_plot(rlnorm, meanlog = 0, sdlog = 0.5,      title = "Log-Normal",      adjust = 2.0)
 p_weibull    <- make_dist_plot(rweibull, shape = 1.5, scale = 1,      title = "Weibull",         adjust = 2.0)
 p_cont_uniform <- make_uniform_plot(min_val = -10, max_val = 10, title = "Cont. Uniform")
-p_laplace    <- make_dist_plot(function(n) rlaplace(n, 0, 1),         title = "Laplace",         adjust = 1.8)
+#p_laplace    <- make_dist_plot(function(n) rlaplace(n, 0, 1),         title = "Laplace",         adjust = 1.8)
 p_logistic <- make_dist_plot(rlogis, location = 0, scale = 1, title = "Logistic", adjust = 1.8)
 p_cauchy <- make_dist_plot(rcauchy, location = 0, scale = 1, title    = "Cauchy",adjust   = 0.9, xlim = c(-20, 20))
 p_pareto <- make_dist_plot(rpareto, scale = 10000, shape    = 1, n_sample = n_sample, title    = "Pareto (log scale)",xlim     = c(1e2, 1e6), adjust   = 2)+  scale_x_log10(expand = c(0,0))
@@ -395,7 +395,7 @@ ggsave(
 ## DISCRETE
 
 p_fix1 <- p_binomial +
-  labs(y = "Fixed trials") +
+  labs(y = "Trials:\nrepeated success/fail experiments") +
   theme(
     axis.title.y = element_text(face = "bold", angle = 0, size = 18,
                                 vjust = 0.5, hjust = 0.5,
@@ -409,7 +409,7 @@ p_fix3 <- trim(p_discrete_uniform)
 p_fix4 = trim(p_bernoulli)
 
 p_cnt1 <- p_poisson +
-  labs(y = "Counting events") +
+  labs(y = "Counts:\n in time or space interval") +
   theme(
     axis.title.y = element_text(face = "bold", angle = 0, size = 18,
                                 vjust = 0.5, hjust = 0.5,
