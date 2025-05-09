@@ -679,18 +679,18 @@ $$
 ---
 ## 2. Distributions
 
-<span style="font-size: 32px;">
+<span style="font-size: 28px;">
 A distribution defines what's typical, what's rare, and what's extreme in a dataset.
 </span>
 <br>
 
 --
 
-<span style="font-size: 32px;">
+<span style="font-size: 28px;">
 Identifying the distribution helps you understand:
 </span>
 
-<ul style="font-size: 26px; line-height: 1.4;">
+<ul style="font-size: 24px; line-height: 1.4;">
   <li>what outcomes are likely and unlikely</li>
   <li>how much variation or uncertainty exists</li>
   <li>whether rare or extreme events fall within expectations</li>
@@ -1427,55 +1427,39 @@ class: inverse, center, large
 <div style="display: flex; justify-content: center;">
 ```{r bias_concept, echo = FALSE, message = FALSE, warning = FALSE}
 
-set.seed(123)
-n <- 20
 true_value <- 100
 
 # Generate data
-unbiased <- rnorm(n, mean = true_value, sd = 5)
-biased <- rnorm(n, mean = true_value + 10, sd = 5)
+unbiased <- true_value
+biased <- true_value +9
 
 df <- data.frame(
   estimate = c(unbiased, biased),
-  type = rep(c("Unbiased", "Biased"), each = n)
-)
-
-# Calculate group means and confidence intervals
-summary_df <- df %>%
-  group_by(type) %>%
-  summarise(
-    mean = mean(estimate),
-    sd = sd(estimate),
-    se = sd / sqrt(n),
-    lower = mean - 1.96 * se,
-    upper = mean + 1.96 * se
-  )
+  type = c("Unbiased", "Biased"))
 
 # Plot
-p_bias = ggplot(summary_df, aes(x = type, y = mean, color = type)) +
+p_bias = ggplot(df, aes(x = type, y = estimate, color = type)) +
   geom_point(size = 4) +
-  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 1) +
   geom_hline(yintercept = true_value, linetype = "dashed", color = "black") +
   labs(title = "Conceptual Illustration of Bias",
-       y = "Average Estimate",
+       y = "Average Estimate\n(across many samples)",
        x = "",
        caption = "Dashed line = true value (reality)") +
   scale_color_manual(values = c("steelblue", "tomato")) +
   theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
-
-ggplotly(p_bias, height = 300, width = 400) %>%
+ggplotly(p_bias, height = 300, width = 450) %>%
   layout(
     annotations = list(
       list(
         text = "Dashed line = true value (reality)",
         x = 0.05,
-        y = 0.15,
+        y = 0.05,
         xref = "paper",
         yref = "paper",
         showarrow = FALSE,
-        font = list(size = 12)
+        font = list(size = 13)
       )
     )
   ) %>%  config(displayModeBar = FALSE)
@@ -1488,37 +1472,11 @@ ggplotly(p_bias, height = 300, width = 400) %>%
 <div style="display: flex; justify-content: center;">
 ```{r bias_concept1, echo = FALSE, message = FALSE, warning = FALSE}
 
-set.seed(123)
-n <- 20
-true_value <- 100
-
-# Generate data
-unbiased <- rnorm(n, mean = true_value, sd = 5)
-biased <- rnorm(n, mean = true_value + 10, sd = 5)
-
-df <- data.frame(
-  estimate = c(unbiased, biased),
-  type = rep(c("Unbiased", "Biased"), each = n)
-)
-
-# Calculate group means and confidence intervals
-summary_df <- df %>%
-  group_by(type) %>%
-  summarise(
-    mean = mean(estimate),
-    sd = sd(estimate),
-    se = sd / sqrt(n),
-    lower = mean - 1.96 * se,
-    upper = mean + 1.96 * se
-  )
-
-# Plot
-p_bias = ggplot(summary_df, aes(x = type, y = mean, color = type)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, linewidth = 1) +
+p_bias = ggplot(df, aes(x = type, y = estimate, color = type)) +
+  geom_point(size = 5) +
   geom_hline(yintercept = true_value, linetype = "dashed", color = "black") +
   labs(title = "Conceptual Illustration of Bias",
-       y = "Average Estimate",
+       y = "Average Estimate\n(across many samples)",
        x = "",
        caption = "Dashed line = true value (reality)") +
   scale_color_manual(values = c("steelblue", "tomato")) +
@@ -1532,7 +1490,7 @@ ggplotly(p_bias, height = 400, width = 500) %>%
       list(
         text = "Dashed line = true value (reality)",
         x = 0.05,
-        y = 0.15,
+        y = 0.05,
         xref = "paper",
         yref = "paper",
         showarrow = FALSE,
@@ -1555,21 +1513,21 @@ ggplotly(p_bias, height = 400, width = 500) %>%
   layout(
     annotations = list(
       list(
-        x = 0.24, y = summary_df$mean[summary_df$type == "Biased"]-0.15,
+        x = 0.24, y = biased-0.2,
         xref = "paper", yref = "y",
         text = TeX("E[\\hat{\\theta}] \\text{ (biased)}"),
         showarrow = TRUE,
         arrowhead = 2,
-        ax = -60, ay = -30,
+        ax = -30, ay = 30,
         font = list(size = 14, color = "black")
       ),
       list(
-        x = 0.75, y = summary_df$mean[summary_df$type == "Unbiased"]-0.08,
+        x = 0.74, y = unbiased+0.5,
         xref = "paper", yref = "y",
         text = TeX("E[\\hat{\\theta}] \\text{ (unbiased)}"),
         showarrow = TRUE,
         arrowhead = 2,
-        ax = 60, ay = -30,
+        ax = 20, ay = -35,
         font = list(size = 14, color = "black")
       ),
       list(
