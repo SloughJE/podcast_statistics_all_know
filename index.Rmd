@@ -732,6 +732,33 @@ class: inverse, center, large, middle
 ---
 
 ![](assets/anscombe_data_corr.png)
+---
+
+## Correlation Coefficient Calcuation (Pearson's correlation)
+
+$$
+r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2} \sqrt{\sum (y_i - \bar{y})^2}}
+$$
+- r = "correlation coefficient"
+- $x_i$, $y_i$ = data points
+- $\bar{x}$, $\bar{y}$ = means
+- Denominator rescales by standard deviations and makes $r$ scale-invariant
+- correlation $r$ determines the slope of the best-fit line.
+- $-1 \leq r \leq 1$
+
+--
+
+Fits a **single straight line** through all the data.<br>
+How $x$ and $y$ vary together, scaled by their spreads.
+
+The closer to 1 or -1, the stronger the correlation.<br>
+The closer to 0, the weaker the correlation.
+
+What is a "good" correlation? 
+
+--
+
+> It depends.
 
 ---
 class: inverse, center, large, middle
@@ -846,7 +873,7 @@ p_reading = ggplot(df, aes(shoe, reading)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, color = "blue") +
   labs(
-      title = "Age vs Reading Score",
+      title = "Shoe Size vs Reading Score",
       x = "shoe size",
       y = "reading score"
     )   + theme_minimal()
