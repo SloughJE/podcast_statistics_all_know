@@ -740,8 +740,7 @@ $$
 r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2} \sqrt{\sum (y_i - \bar{y})^2}}
 $$
 - r = "correlation coefficient"
-- $x_i$, $y_i$ = data points
-- $\bar{x}$, $\bar{y}$ = means
+- $x_i$, $y_i$ = data points, $\bar{x}$, $\bar{y}$ = means
 - Denominator rescales by standard deviations and makes $r$ scale-invariant
 - correlation $r$ determines the slope of the best-fit line.
 - $-1 \leq r \leq 1$
