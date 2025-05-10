@@ -734,13 +734,13 @@ class: inverse, center, large, middle
 ![](assets/anscombe_data_corr.png)
 ---
 
-## Correlation Coefficient Calcuation (Pearson's correlation)
+## Correlation Coefficient Calcuation (Pearson's)
 
 $$
 r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2} \sqrt{\sum (y_i - \bar{y})^2}}
 $$
 - r = "correlation coefficient"
-- $x_i$, $y_i$ = data points, $\bar{x}$, $\bar{y}$ = means
+- $x_i$ and $y_i$ = data points; $\bar{x}$ and $\bar{y}$ = means
 - Denominator rescales by standard deviations and makes $r$ scale-invariant
 - correlation $r$ determines the slope of the best-fit line.
 - $-1 \leq r \leq 1$
